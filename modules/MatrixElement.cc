@@ -17,6 +17,14 @@
  */
 
 
+
+
+
+
+//***********************************
+// CODE MODIFIED FOR pp->WW->ll+MET *
+//***********************************
+
 #include <ConfigurationSet.h>
 #include <Module.h>
 #include <Types.h>
@@ -24,7 +32,7 @@
 #include <logging.h>
 
 #include <LHAPDF/LHAPDF.h>
-#include <cpp_pp_ttx_fullylept.h>
+#include <PROC_SA_sm_0.h>
 
 class MatrixElement: public Module {
     struct ParticleId {
@@ -37,7 +45,7 @@ class MatrixElement: public Module {
         MatrixElement(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName()) {
 
             sqrt_s = parameters.globalConfiguration().get<double>("energy");
-            M_T = parameters.globalConfiguration().get<double>("top_mass");
+            M_W = parameters.globalConfiguration().get<double>("W_mass");
 
             m_partons = get<std::vector<std::vector<LorentzVector>>>(parameters.get<InputTag>("initialState"));
 
@@ -81,9 +89,11 @@ class MatrixElement: public Module {
                 m_jacobians.push_back(get<double>(tag));
             }
 
-            std::string param_card = parameters.get<std::string>("card");
-            m_ME_parameters.reset(new Parameters_sm(param_card));
-            m_ME.reset(new cpp_pp_ttx_fullylept(*m_ME_parameters));
+
+	    std::string param_card = parameters.get<std::string>("card");
+	    m_ME_parameters.reset(new Parameters_sm(param_card));
+	    m_ME.reset(new PROC_SA_sm_0(*m_ME_parameters));
+
 
             // PDF
             std::string pdf = parameters.get<std::string>("pdf");
@@ -134,6 +144,11 @@ class MatrixElement: public Module {
                 indexing.push_back(m_particles_ids[i].me_index - 1);
             }
 
+            
+            
+            
+            
+            
             // Sort the array taking into account the indexing in the configuration
             std::vector<int64_t> suite(indexing.size());
             for (size_t i = 0; i < indexing.size(); i++)
@@ -149,6 +164,9 @@ class MatrixElement: public Module {
 
             auto result = m_ME->sigmaKin(initialState, finalStates);
 
+             
+             
+             
             double x1 = std::abs(partons[0].Pz() / (sqrt_s / 2.));
             double x2 = std::abs(partons[1].Pz() / (sqrt_s / 2.));
 
@@ -170,10 +188,21 @@ class MatrixElement: public Module {
             // PDF
             double final_weight = 0;
             for (const auto& me: result) {
-                double pdf1 = m_pdf->xfxQ2(me.first.first, x1, SQ(M_T)) / x1;
-                double pdf2 = m_pdf->xfxQ2(me.first.second, x2, SQ(M_T)) / x2;
+                
+                
+                
+            double pdf1 = m_pdf->xfxQ2(me.first.first, x1, SQ(M_W)) / x1;
+            double pdf2 = m_pdf->xfxQ2(me.first.second, x2, SQ(M_W)) / x2;
 
-                final_weight += me.second * pdf1 * pdf2;
+                
+                
+           //final_weight += me.second * pdf1 * pdf2;
+                
+            //Rewriting final_weight with me=1:
+                final_weight += 1*pdf1*pdf2;
+            
+                
+                
             }
 
             final_weight *= weight;
@@ -181,8 +210,10 @@ class MatrixElement: public Module {
         }
 
     private:
-        double sqrt_s;
-        double M_T;
+  double sqrt_s;
+
+        double M_W;
+
 
         std::shared_ptr<const std::vector<std::vector<LorentzVector>>> m_partons;
 
@@ -196,8 +227,7 @@ class MatrixElement: public Module {
         std::vector<std::shared_ptr<const double>> m_jacobians;
 
         std::shared_ptr<Parameters_sm> m_ME_parameters;
-        std::shared_ptr<cpp_pp_ttx_fullylept> m_ME;
-
+        std::shared_ptr<PROC_SA_sm_0> m_ME;
         std::shared_ptr<LHAPDF::PDF> m_pdf;
 
         std::shared_ptr<std::vector<double>> m_weights = produce<std::vector<double>>("weights");

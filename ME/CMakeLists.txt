@@ -6,7 +6,7 @@ if(${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 6)
 endif(${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 6)
 
 file(GLOB_RECURSE SOURCES *.cc)
-add_library(ME_cpp_pp_ttx_fullylept SHARED ${SOURCES})
+add_library(ME_PROC_SA_sm_0 SHARED ${SOURCES})
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/src")
 

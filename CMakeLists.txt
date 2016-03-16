@@ -2,9 +2,14 @@ cmake_minimum_required(VERSION 2.8.8)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules")
 
+# CMAKE_CURRENT_LIST_DIR cmake 2.6 compatibility
+#if(${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 6)
+#    get_filename_component(CMAKE_CURRENT_LIST_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+#endif(${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 6)
+
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include")
 
-# Options
+#Options
 option(USE_BUILTIN_LUA "Force usage of built-in lua interpreter, even if a system-wide version if available" OFF)
 
 # Find dependencies
@@ -12,7 +17,7 @@ find_package(ROOT REQUIRED)
 find_package(LHAPDF 6.0 REQUIRED)
 
 if (NOT USE_BUILTIN_LUA)
-    find_package(Lua QUIET)
+   find_package(Lua QUIET)
 endif()
 
 # Include external
@@ -21,18 +26,17 @@ add_subdirectory(external)
 add_subdirectory(ME)
 
 if (NOT LUA_FOUND)
-    if (USE_BUILTIN_LUA)
-        message(STATUS "Using built-in lua interpreter")
-    else()
-        message(STATUS "No system-wide Lua found. Using built-in distribution")
-    endif()
+   if (USE_BUILTIN_LUA)
+      message(STATUS "Using built-in lua interpreter")
+   else()
+      message(STATUS "No system-wide Lua found. Using built-in distribution")
+   endif()
     set(LUA_LIBRARIES lua)
     set(LUA_INCLUDE_DIR "external/lua")
 endif()
 
-
 set(MOMEMTA_SOURCES
-    "modules/BlockD.cc"
+    "modules/BlockF.cc"
     "modules/Boost.cc"
     "modules/Flatter.cc"
     "modules/GaussianTransferFunction.cc"
@@ -56,7 +60,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O2 -fcx-fortran-rules -fc
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(ME/src)
-include_directories(ME/SubProcesses/P1_Sigma_sm_gg_mupvmbmumvmxbx)
+include_directories(ME/SubProcesses/P1_Sigma_sm_uux_epvemumvmx)
 include_directories(${EXTERNAL_DIR})
 include_directories(${EXTERNAL_DIR}/cuba)
 include_directories(${EXTERNAL_DIR}/spdlog)
@@ -68,7 +72,7 @@ target_link_libraries(momemta dl)
 target_link_libraries(momemta cuba)
 target_link_libraries(momemta ${LUA_LIBRARIES})
 target_link_libraries(momemta pthread)
-target_link_libraries(momemta ME_cpp_pp_ttx_fullylept)
+target_link_libraries(momemta ME_PROC_SA_sm_0)
 target_link_libraries(momemta ${LHAPDF_LIBRARIES})
 target_link_libraries(momemta ${ROOT_LIBRARIES})
 

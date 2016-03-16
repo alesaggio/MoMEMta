@@ -1,0 +1,26 @@
+//Written by Alessia
+
+
+#include <ConfigurationSet.h>
+#include <Module.h>
+#include <Types.h>
+#include <Utils.h>
+#include <logging.h>
+
+
+class MatrixElement : public Module {
+
+
+     public:
+
+ MatrixElement(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName());
+
+
+  
+
+
+
+
+
+
+};

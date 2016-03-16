@@ -85,6 +85,17 @@ void Parameters_sm::setIndependentParameters()
 }
 void Parameters_sm::setIndependentCouplings()
 {
+  GC_1 = -(mdl_ee * mdl_complexi)/3.; 
+  GC_2 = (2. * mdl_ee * mdl_complexi)/3.; 
+  GC_3 = -(mdl_ee * mdl_complexi); 
+  GC_4 = mdl_ee * mdl_complexi; 
+  GC_50 = -(mdl_cw * mdl_ee * mdl_complexi)/(2. * mdl_sw); 
+  GC_51 = (mdl_cw * mdl_ee * mdl_complexi)/(2. * mdl_sw); 
+  GC_53 = (mdl_cw * mdl_ee * mdl_complexi)/mdl_sw; 
+  GC_58 = -(mdl_ee * mdl_complexi * mdl_sw)/(6. * mdl_cw); 
+  GC_59 = (mdl_ee * mdl_complexi * mdl_sw)/(2. * mdl_cw); 
+  GC_62 = (mdl_cw * mdl_ee * mdl_complexi)/(2. * mdl_sw) + (mdl_ee *
+      mdl_complexi * mdl_sw)/(2. * mdl_cw);
   GC_100 = (mdl_ee * mdl_complexi * mdl_conjg__CKM1x1)/(mdl_sw * mdl_sqrt__2); 
 }
 void Parameters_sm::setDependentParameters()
@@ -95,8 +106,7 @@ void Parameters_sm::setDependentParameters()
 }
 void Parameters_sm::setDependentCouplings()
 {
-  GC_11 = mdl_complexi * G; 
-  GC_10 = -G; 
+
 }
 
 // Routines for printing out parameters
@@ -203,6 +213,26 @@ void Parameters_sm::printIndependentParameters()
 void Parameters_sm::printIndependentCouplings()
 {
   cout <<  "sm model couplings independent of event kinematics:" << endl; 
+  cout << setw(20) <<  "GC_1 " <<  "= " << setiosflags(ios::scientific) <<
+      setw(10) << GC_1 << endl;
+  cout << setw(20) <<  "GC_2 " <<  "= " << setiosflags(ios::scientific) <<
+      setw(10) << GC_2 << endl;
+  cout << setw(20) <<  "GC_3 " <<  "= " << setiosflags(ios::scientific) <<
+      setw(10) << GC_3 << endl;
+  cout << setw(20) <<  "GC_4 " <<  "= " << setiosflags(ios::scientific) <<
+      setw(10) << GC_4 << endl;
+  cout << setw(20) <<  "GC_50 " <<  "= " << setiosflags(ios::scientific) <<
+      setw(10) << GC_50 << endl;
+  cout << setw(20) <<  "GC_51 " <<  "= " << setiosflags(ios::scientific) <<
+      setw(10) << GC_51 << endl;
+  cout << setw(20) <<  "GC_53 " <<  "= " << setiosflags(ios::scientific) <<
+      setw(10) << GC_53 << endl;
+  cout << setw(20) <<  "GC_58 " <<  "= " << setiosflags(ios::scientific) <<
+      setw(10) << GC_58 << endl;
+  cout << setw(20) <<  "GC_59 " <<  "= " << setiosflags(ios::scientific) <<
+      setw(10) << GC_59 << endl;
+  cout << setw(20) <<  "GC_62 " <<  "= " << setiosflags(ios::scientific) <<
+      setw(10) << GC_62 << endl;
   cout << setw(20) <<  "GC_100 " <<  "= " << setiosflags(ios::scientific) <<
       setw(10) << GC_100 << endl;
 }
@@ -219,10 +249,7 @@ void Parameters_sm::printDependentParameters()
 void Parameters_sm::printDependentCouplings()
 {
   cout <<  "sm model couplings dependent on event kinematics:" << endl; 
-  cout << setw(20) <<  "GC_11 " <<  "= " << setiosflags(ios::scientific) <<
-      setw(10) << GC_11 << endl;
-  cout << setw(20) <<  "GC_10 " <<  "= " << setiosflags(ios::scientific) <<
-      setw(10) << GC_10 << endl;
+
 }
 
 

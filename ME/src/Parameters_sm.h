@@ -37,9 +37,10 @@ class Parameters_sm
     // Model parameters dependent on aS
     double mdl_sqrt__aS, G, mdl_G__exp__2; 
     // Model couplings independent of aS
-    std::complex<double> GC_100; 
+    std::complex<double> GC_1, GC_2, GC_3, GC_4, GC_50, GC_51, GC_53, GC_58,
+        GC_59, GC_62, GC_100;
     // Model couplings dependent on aS
-    std::complex<double> GC_11, GC_10; 
+
 
     // Set parameters that are unchanged during the run
     void setIndependentParameters(); 

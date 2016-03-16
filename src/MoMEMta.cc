@@ -17,6 +17,14 @@
  */
 
 
+
+
+
+
+//***********************************
+// CODE MODIFIED FOR pp->WW->ll+MET *
+//***********************************
+
 #include <cstring>
 
 #include <cuba.h>
@@ -136,8 +144,8 @@ double MoMEMta::integrand(const double* psPoints, const double* weights) {
         module->work();
     }
 
-    const std::vector<double>& me_weights = *m_pool->get<std::vector<double>>({"ttbar", "weights"});
-    //const std::vector<std::vector<LorentzVector>>& i = *Pool::get().get<std::vector<std::vector<LorentzVector>>>({"blockd", "invisibles"});
+    const std::vector<double>& me_weights = *m_pool->get<std::vector<double>>({"WW", "weights"});
+    //const std::vector<std::vector<LorentzVector>>& i = *Pool::get().get<std::vector<std::vector<LorentzVector>>>({"blockf", "invisibles"});
 
     double sum = 0;
     for (const auto& p: me_weights) {
