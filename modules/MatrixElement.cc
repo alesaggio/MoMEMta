@@ -46,7 +46,7 @@ class MatrixElement: public Module {
 
             sqrt_s = parameters.globalConfiguration().get<double>("energy");
             M_W = parameters.globalConfiguration().get<double>("W_mass");
-
+            
             m_partons = get<std::vector<std::vector<LorentzVector>>>(parameters.get<InputTag>("initialState"));
 
             const auto& invisibles_set = parameters.get<ConfigurationSet>("invisibles");
@@ -164,9 +164,6 @@ class MatrixElement: public Module {
 
             auto result = m_ME->sigmaKin(initialState, finalStates);
 
-             
-             
-             
             double x1 = std::abs(partons[0].Pz() / (sqrt_s / 2.));
             double x2 = std::abs(partons[1].Pz() / (sqrt_s / 2.));
 
@@ -196,10 +193,7 @@ class MatrixElement: public Module {
 
                 
                 
-           //final_weight += me.second * pdf1 * pdf2;
-                
-            //Rewriting final_weight with me=1:
-                final_weight += 1*pdf1*pdf2;
+            final_weight += me.second * pdf1 * pdf2;
             
                 
                 
@@ -210,8 +204,7 @@ class MatrixElement: public Module {
         }
 
     private:
-  double sqrt_s;
-
+        double sqrt_s;
         double M_W;
 
 
@@ -223,6 +216,7 @@ class MatrixElement: public Module {
 
         std::vector<InputTag> m_particles_tags;
         std::vector<ParticleId> m_particles_ids;
+
 
         std::vector<std::shared_ptr<const double>> m_jacobians;
 

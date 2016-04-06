@@ -41,13 +41,22 @@
 class BlockF: public Module {
     public:
 
-        BlockF(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName()) {
+  BlockF(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName()) {
+
+            m_ps_point1 = parameters.get<InputTag>("q1");
+            m_ps_point1.resolve(pool);
+
+            m_ps_point2 = parameters.get<InputTag>("q2");
+            m_ps_point2.resolve(pool);
+
+
             sqrt_s = parameters.globalConfiguration().get<double>("energy");
 
-	    m_partons = get<std::vector<std::vector<LorentzVector>>>(parameters.get<InputTag>("initialState"));
 
             s13 = get<double>(parameters.get<InputTag>("s13"));
             s24 = get<double>(parameters.get<InputTag>("s24"));
+	    
+
 
             m_particle_tags = parameters.get<std::vector<InputTag>>("inputs");
             for (auto& t: m_particle_tags)
@@ -65,7 +74,7 @@ class BlockF: public Module {
 
             
             
-            //let the variables E2 and p2y as free parameters
+            //leave the variables E2 and p2y as free parameters
             
             std::vector<double> E2;
             std::vector<double> p2y;
@@ -84,12 +93,13 @@ class BlockF: public Module {
             double pby = p3y+p4y;
             double pbz = p3z+p4z;
             
-            double x1 = std::abs((*m_partons)[0][0].Pz() / (sqrt_s / 2.));
-	    double x2 = std::abs((*m_partons)[0][1].Pz() / (sqrt_s / 2.));
+	    double q1 = m_ps_point1.get<double>();
+	    double q2 = m_ps_point2.get<double>();
+
+
+            const double Qm = sqrt_s*(q1-q2)/2.;
+            const double Qp = sqrt_s*(q1+q2)/2.;
             
-            const double Qm = sqrt_s*(x1-x2)/2.;
-            const double Qp = sqrt_s*(x1+x2)/2.;
-            double s13, s24;
             
             //p1x = alpha1*p2y + beta1*E2 + gamma1
             //p1y = alpha2*p2y + beta2*E2 + gamma2
@@ -104,7 +114,7 @@ class BlockF: public Module {
             double beta1 = (E4*p3z-E3*p4z)/(p3z*p4x+p3x*p4z);
             double gamma1 = (SQ(M_mu)*p3z-2*E3*Eb*p4z+SQ(M_el)*p4z+2*p3z*p4x*pbx+
                             2*p3y*p4z*pby+2*p3z*p4z*pbz-2*p3z*p4z*Qm+2*E3*p4z*Qp-
-                            p4z*s13-p3z*s24)/(2*(-p3z*p4x+p3x*p4z));
+                            p4z*(*s13)-p3z*(*s24))/(2*(-p3z*p4x+p3x*p4z));
             
             double alpha2 = -1;
             double beta2 = 0;
@@ -114,22 +124,22 @@ class BlockF: public Module {
             double beta3 = (E4*p3x-E3*p4x)/(p3z*p4x-p3x*p4z);
             double gamma3 = 0.5*((SQ(M_mu)*p3x-2*E3*Eb*p4x+SQ(M_el)*p4x+2*p3x*p4x*pbx+
                             2*p3y*p4x*pby+2*p3x*p4z*pbz-2*p3x*p4z*Qm+2*E3*p4x*Qp-
-                            p4x*s13-p3x*s24)/(p3z*p4x-p3x*p4z));
+                            p4x*(*s13)-p3x*(*s24))/(p3z*p4x-p3x*p4z));
             
             double alpha4 = (p3z*p4y-p3y*p4z)/(-p3z*p4x+p3x*p4z);
             double beta4 = (-E4*p3z+E3*p4z)/(-p3z*p4x+p3x*p4z);
             double gamma4 = (-2*SQ(M_mu)*p3z+4*E3*Eb*p4z-2*SQ(M_el)*p4z-
                              4*p3z*p4x*pbx-4*p3y*p4z*pby-4*p3z*p4z*pbz+
-                             4*p3z*p4z*Qm-4*E3*p4z*Qp+2*p4z*s13+
-                             2*p3z*s24)/(-4*p3z*p4x+4*p3x*p4z)-pbx;
+                             4*p3z*p4z*Qm-4*E3*p4z*Qp+2*p4z*(*s13)+
+                             2*p3z*(*s24))/(-4*p3z*p4x+4*p3x*p4z)-pbx;
             
             
             double alpha5 = (-p3y*p4x+p3x*p4y)/(p3z*p4x-p3x*p4z);
             double beta5 = (-E4*p3x+E3*p4x)/(p3z*p4x-p3x*p4z);
             double gamma5 = 0.5*((-SQ(M_mu)*p3x+2*E3*Eb*p4x-SQ(M_el)*p4x-
                             2*p3x*p4x*pbx-2*p3y*p4x*pby-2*p3z*p4x*pbz+
-                            2*p3z*p4x*Qm-2*E3*p4x*Qp+p4x*s13+
-                            p3x*s24)/(p3z*p4x-p3x*p4z));
+                            2*p3z*p4x*Qm-2*E3*p4x*Qp+p4x*(*s13)+
+                            p3x*(*s24))/(p3z*p4x-p3x*p4z));
             
             double alpha6 = 0;
             double beta6 = -1;
@@ -189,10 +199,10 @@ class BlockF: public Module {
                 
                 invisibles->push_back({p1, p2});
                 jacobians->push_back(computeJacobian(p1, p2, p3, p4));
-                
-                
+            
+	    }    
 
-            }
+            
             
         }
     
@@ -207,7 +217,7 @@ class BlockF: public Module {
     
 
         virtual size_t dimensions() const override {
-            return 0;
+            return 2;
         }
 
         double computeJacobian(const LorentzVector& p1, const LorentzVector& p2, const LorentzVector& p3, const LorentzVector& p4) {
@@ -259,12 +269,12 @@ class BlockF: public Module {
     private:
         double sqrt_s;
 
-	std::shared_ptr<const std::vector<std::vector<LorentzVector>>> m_partons;
-
         std::vector<InputTag> m_particle_tags;
 
         std::shared_ptr<const double> s13;
         std::shared_ptr<const double> s24;
+        InputTag m_ps_point1;
+        InputTag m_ps_point2;
 
         std::shared_ptr<std::vector<std::vector<LorentzVector>>> invisibles = produce<std::vector<std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double>>>>>("invisibles");
         std::shared_ptr<std::vector<double>> jacobians = produce<std::vector<double>>("jacobians");

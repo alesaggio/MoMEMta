@@ -68,6 +68,8 @@ BlockF.blockf = {
 
     s13 = 'flatter_s13::s',
     s24 = 'flatter_s24::s',
+    q1 = 'cuba::ps_points/4',
+    q2 = 'cuba::ps_points/5'
 }
 
 Boost.boost = {

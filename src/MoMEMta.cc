@@ -66,17 +66,20 @@ MoMEMta::MoMEMta(const ConfigurationReader& configuration) {
 
     // Construct modules from configuration
     std::vector<LightModule> modules = configuration.getModules();
+
     for (const auto& module: modules) {
         m_modules.push_back(ModuleFactory::get().create(module.type, m_pool, *module.parameters));
         m_modules.back()->configure();
     }
-    
+
+
     m_n_dimensions = 0;
     for (const auto& module: m_modules) {
         m_n_dimensions += module->dimensions();
     }
 
     LOG(info) << "Number of dimensions for integration: " << m_n_dimensions;
+
 
     // Resize pool ps-points vector
     m_ps_points->resize(m_n_dimensions);

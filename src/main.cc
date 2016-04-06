@@ -36,38 +36,25 @@ int main(int argc, char** argv) {
 
     spdlog::set_level(spdlog::level::trace);
 
-
-    std::cout << "A" << std::endl;
-
     ConfigurationReader configuration("../confs/example.lua");
-    std::cout << "B" << std::endl;
 
     MoMEMta weight(configuration);
-    std::cout << "C" << std::endl;
 
     // Electron
     LorentzVector p3(16.171895980835, -13.7919054031372, -3.42997527122497, 21.5293197631836);
     // Muon
     LorentzVector p4(-18.9018573760986, 10.0896110534668, -0.602926552295686, 21.4346446990967);
-
-   std::cout << "D" << std::endl;
     
     auto start_time = system_clock::now();
     std::vector<std::pair<double, double>> weights = weight.computeWeights({p3, p4});
     auto end_time = system_clock::now();
-
-    std::cout << "E" << std::endl;
 
     LOG(debug) << "Result:";
     for (const auto& r: weights) {
         LOG(debug) << r.first << " +- " << r.second;
     }
 
-    std::cout << "F" << std::endl;
-
     LOG(info) << "Weight computed in " << std::chrono::duration_cast<milliseconds>(end_time - start_time).count() << "ms";
-
-    std::cout << "G" << std::endl;
 
     return 0;
 }

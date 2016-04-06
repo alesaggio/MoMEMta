@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+
 std::vector<std::string> split(const std::string& s, const std::string& delimiters);
 
 class Pool;
@@ -98,7 +99,7 @@ struct InputTag {
 
         template<typename T> const T& get() const {
             if (! resolved) {
-                throw tag_not_resolved_error("You must call 'resolve' once before calling 'get'"); 
+                throw tag_not_resolved_error("You must call 'resolve' once before calling 'get'");
             }
 
             if (isIndexed()) {
