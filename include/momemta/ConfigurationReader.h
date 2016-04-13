@@ -17,18 +17,39 @@
  */
 
 
+#pragma once
+
+#include <memory>
+#include <string>
+#include <vector>
+
 #include <momemta/ConfigurationSet.h>
-#include <momemta/Module.h>
 
-class EmptyModule: public Module {
-    public:
-
-        EmptyModule(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName()) {
-            // Empty
-        };
-
-        virtual void work() override {
-
-        }
+struct LightModule {
+    std::string name;
+    std::string type;
+    std::shared_ptr<ConfigurationSet> parameters;
 };
-REGISTER_MODULE(EmptyModule);
+
+class lua_State;
+
+class ConfigurationReader {
+    public:
+        ConfigurationReader(const std::string&);
+        virtual ~ConfigurationReader();
+
+        void addModule(const std::string& type, const std::string& name);
+
+        std::vector<LightModule> getModules() const;
+
+        std::shared_ptr<ConfigurationSet> getVegasConfiguration() const {
+            return m_vegas_configuration;
+        }
+
+    private:
+        std::vector<LightModule> m_light_modules;
+        std::shared_ptr<ConfigurationSet> m_global_configuration;
+        std::shared_ptr<ConfigurationSet> m_vegas_configuration;
+
+        lua_State* lua_state = nullptr;
+};

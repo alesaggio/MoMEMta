@@ -17,18 +17,19 @@
  */
 
 
-#include <momemta/ConfigurationSet.h>
-#include <momemta/Module.h>
+#pragma once
 
-class EmptyModule: public Module {
+#include <string>
+
+// A small wrapper around dlopen / dlclose
+struct SharedLibrary {
     public:
+        SharedLibrary(const std::string& path);
+        ~SharedLibrary();
 
-        EmptyModule(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName()) {
-            // Empty
-        };
+        SharedLibrary(const SharedLibrary&) = delete;
+        SharedLibrary& operator=(const SharedLibrary&) = delete;
 
-        virtual void work() override {
-
-        }
+    private:
+        void* m_handle = nullptr;
 };
-REGISTER_MODULE(EmptyModule);

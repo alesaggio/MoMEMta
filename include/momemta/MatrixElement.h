@@ -16,19 +16,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 
-#include <momemta/ConfigurationSet.h>
-#include <momemta/Module.h>
+#ifndef MOMEMTA_MATRIXELEMENT_H
+#define MOMEMTA_MATRIXELEMENT_H
 
-class EmptyModule: public Module {
-    public:
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
-        EmptyModule(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName()) {
-            // Empty
-        };
+#include <momemta/MEParameters.h>
 
-        virtual void work() override {
+class ConfigurationSet;
 
-        }
-};
-REGISTER_MODULE(EmptyModule);
+namespace momemta {
+    
+    class MatrixElement {
+        public:
+            using Result = std::map<std::pair<int, int>, double>;
+
+            MatrixElement() = default;
+            virtual ~MatrixElement() {};
+    
+            virtual Result compute(
+                    const std::vector<std::vector<double>>& initialMomenta,
+                    const std::vector<std::pair<int, std::vector<double>>>& finalState
+                    ) = 0;
+
+            virtual std::shared_ptr<MEParameters> getParameters() = 0;
+    };
+
+}
+
+#endif

@@ -17,18 +17,9 @@
  */
 
 
-#include <momemta/ConfigurationSet.h>
-#include <momemta/Module.h>
+#include <momemta/ModuleFactory.h>
 
-class EmptyModule: public Module {
-    public:
-
-        EmptyModule(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName()) {
-            // Empty
-        };
-
-        virtual void work() override {
-
-        }
-};
-REGISTER_MODULE(EmptyModule);
+template<> PluginFactory<ModuleFactory::type>& PluginFactory<ModuleFactory::type>::get() {
+    static PluginFactory<ModuleFactory::type> s_instance;
+    return s_instance;
+}

@@ -16,19 +16,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 
-#include <momemta/ConfigurationSet.h>
-#include <momemta/Module.h>
+#ifndef MOMEMTA_MEPARAMETERS_H
+#define MOMEMTA_MEPARAMETERS_H
 
-class EmptyModule: public Module {
-    public:
+#include <unordered_map>
 
-        EmptyModule(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName()) {
-            // Empty
-        };
+namespace momemta {
 
-        virtual void work() override {
+    class MEParameters {
+        public:
+            MEParameters() = default;
+            virtual ~MEParameters() {};
 
-        }
-};
-REGISTER_MODULE(EmptyModule);
+            virtual void cacheParameters() = 0;
+            virtual void cacheCouplings() = 0;
+
+            virtual void updateParameters() = 0; 
+            virtual void updateCouplings() = 0;
+
+        protected:
+            std::unordered_map<std::string, double> m_card_parameters;
+    };
+
+}
+
+#endif

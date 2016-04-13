@@ -17,18 +17,24 @@
  */
 
 
-#include <momemta/ConfigurationSet.h>
-#include <momemta/Module.h>
+#pragma once
 
-class EmptyModule: public Module {
-    public:
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-        EmptyModule(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName()) {
-            // Empty
-        };
+#include <logging.h>
 
-        virtual void work() override {
+#include <momemta/PluginFactory.h>
 
-        }
-};
-REGISTER_MODULE(EmptyModule);
+// Forward declaration
+class Module;
+class ConfigurationSet;
+class Pool;
+
+// Register ModuleFactory used by all the modules
+using ModuleFactory = PluginFactory<Module* (std::shared_ptr<Pool>, const ConfigurationSet&)>;
+
+#define REGISTER_MODULE(type) \
+    static const ModuleFactory::PMaker<type> PLUGIN_UNIQUE_NAME(s_module , __LINE__)(#type)

@@ -17,18 +17,35 @@
  */
 
 
-#include <momemta/ConfigurationSet.h>
-#include <momemta/Module.h>
+#include <momemta/InputTag.h>
+#include <momemta/Pool.h>
 
-class EmptyModule: public Module {
-    public:
+std::vector<std::string> split(const std::string& s, const std::string& delimiters) {
 
-        EmptyModule(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName()) {
-            // Empty
-        };
+    std::vector<std::string> result;
 
-        virtual void work() override {
+    size_t current;
+    size_t next = -1;
+    do
+    {
+        next = s.find_first_not_of(delimiters, next + 1);
+        if (next == std::string::npos)
+            break;
+        next -= 1;
 
-        }
-};
-REGISTER_MODULE(EmptyModule);
+        current = next + 1;
+        next = s.find_first_of(delimiters, current);
+        result.push_back(s.substr(current, next - current));
+    }
+    while (next != std::string::npos);
+
+    return result;
+}
+
+void InputTag::resolve(PoolPtr pool) const {
+    if (resolved)
+        return;
+
+    content = pool->raw_get(*this);
+    resolved = true;
+}

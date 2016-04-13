@@ -17,18 +17,19 @@
  */
 
 
-#include <momemta/ConfigurationSet.h>
-#include <momemta/Module.h>
+#include <dlfcn.h>
 
-class EmptyModule: public Module {
-    public:
+#include <logging.h>
+#include <SharedLibrary.h>
 
-        EmptyModule(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName()) {
-            // Empty
-        };
+SharedLibrary::SharedLibrary(const std::string& path) {
+    m_handle = ::dlopen(path.c_str(), RTLD_LAZY | RTLD_LOCAL);
+    if (! m_handle) {
+        LOG(error) << "Failed to open '" << path << "': " << dlerror();
+    }
+}
 
-        virtual void work() override {
-
-        }
-};
-REGISTER_MODULE(EmptyModule);
+SharedLibrary::~SharedLibrary() {
+    if (m_handle != nullptr)
+        ::dlclose(m_handle);
+}

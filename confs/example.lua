@@ -7,6 +7,7 @@ function append(t1, t2)
 end
 
 load_modules('libempty_module.so')
+load_modules('MatrixElements/dummy/libme_dummy.so')
 
 M_W = 80.419002
 W_W = 2.047600e+00
@@ -30,6 +31,10 @@ end
 configuration = {
     energy = 13000.,
     W_mass = M_W
+}
+
+vegas = {
+    verbosity = 3
 }
 
 Flatter.flatter_s13 = {
@@ -89,7 +94,11 @@ end
 
 MatrixElement.WW = {
   pdf = 'CT10nlo',
-  card = '../ME/Cards/param_card.dat',
+
+  matrix_element = 'pp_ttx_fully_leptonic',
+  matrix_element_parameters = {
+      card = '../MatrixElements/Cards/param_card.dat'
+  },
 
   initialState = 'boost::output',
 

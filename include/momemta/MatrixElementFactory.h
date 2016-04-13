@@ -17,18 +17,25 @@
  */
 
 
-#include <momemta/ConfigurationSet.h>
-#include <momemta/Module.h>
+#pragma once
 
-class EmptyModule: public Module {
-    public:
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-        EmptyModule(PoolPtr pool, const ConfigurationSet& parameters): Module(pool, parameters.getModuleName()) {
-            // Empty
-        };
+#include <logging.h>
 
-        virtual void work() override {
+#include <momemta/PluginFactory.h>
 
-        }
-};
-REGISTER_MODULE(EmptyModule);
+class ConfigurationSet;
+
+// Forward declaration
+namespace momemta {
+    class MatrixElement;
+}
+
+using MatrixElementFactory = PluginFactory<momemta::MatrixElement* (const ConfigurationSet&)>;
+
+#define REGISTER_MATRIX_ELEMENT(name, type) \
+    static const MatrixElementFactory::PMaker<type> PLUGIN_UNIQUE_NAME(s_matrix_element , __LINE__)(name)
