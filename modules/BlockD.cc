@@ -21,6 +21,7 @@
 #include <momemta/Module.h>
 #include <momemta/Types.h>
 #include <momemta/Utils.h>
+#include <iomanip>
 
 class BlockD: public Module {
     public:
@@ -56,59 +57,200 @@ class BlockD: public Module {
             // so we add pt_isr to pt_vis in order to have pt_vis + pt_nu + pt_isr = 0 as it should be.
             auto pT = p3 + p4 + p5 + p6 + ISR;
 
-            const double p34 = p3.Dot(p4);
-            const double p56 = p5.Dot(p6);
             const double p33 = p3.M2();
             const double p44 = p4.M2();
             const double p55 = p5.M2();
             const double p66 = p6.M2();
+	    const double ptbx = pT.Px();
+	    const double ptby = pT.Py();
 
-            // A1 p1x + B1 p1y + C1 = 0, with C1(E1,E2)
-            // A2 p1y + B2 p2y + C2 = 0, with C2(E1,E2)
-            // ==> express p1x and p1y as functions of E1, E2
+	    const double p3x = p3.Px();
+	    const double p3y = p3.Py();
+	    const double p3z = p3.Pz();
+	    const double E3 = p3.E();
+	    const double p4x = p4.Px();
+	    const double p4y = p4.Py();
+	    const double p4z = p4.Pz();
+	    const double E4 = p4.E();
+	    const double p5x = p5.Px();
+	    const double p5y = p5.Py();
+	    const double p5z = p5.Pz();
+	    const double E5 = p5.E();
+	    const double p6x = p6.Px();
+	    const double p6y = p6.Py();
+	    const double p6z = p6.Pz();
+	    const double E6 = p6.E();
 
-            const double A1 = 2.*( -p3.Px() + p3.Pz()*p4.Px()/p4.Pz() );
-            const double A2 = 2.*( p5.Px() - p5.Pz()*p6.Px()/p6.Pz() );
 
-            const double B1 = 2.*( -p3.Py() + p3.Pz()*p4.Py()/p4.Pz() );
-            const double B2 = 2.*( p5.Py() - p5.Pz()*p6.Py()/p6.Pz() );
 
-            const double Dx = B2*A1 - B1*A2;
-            const double Dy = A2*B1 - A1*B2;
+	    
 
-            const double X = 2*( pT.Px()*p5.Px() + pT.Py()*p5.Py() - p5.Pz()/p6.Pz()*( 0.5*(*s25 - *s256 + p66) + p56 + pT.Px()*p6.Px() + pT.Py()*p6.Py() ) ) + p55 - *s25;
-            const double Y = p3.Pz()/p4.Pz()*( *s13 - *s134 + 2*p34 + p44 ) - p33 + *s13;
+	    //p1x = alpha1*E1 + beta1*E2 + gamma1
+	    //p1y = alpha2*E1 + beta2*E2 + gamma2
+	    //p1z = alpha3*E1 + beta3*E2 + gamma3
+	    //p2x = alpha4*E1 + beta4*E2 + gamma4
+	    //p2y = alpha5*E1 + beta5*E2 + gamma5
+	    //p2z = alpha6*E1 + beta6*E2 + gamma6
 
-            // p1x = alpha1 E1 + beta1 E2 + gamma1
-            // p1y = ...(2)
-            // p1z = ...(3)
-            // p2z = ...(4)
-            // p2x = ...(5)
-            // p2y = ...(6)
 
-            const double alpha1 = -2*B2*(p3.E() - p4.E()*p3.Pz()/p4.Pz())/Dx;
-            const double beta1 = 2*B1*(p5.E() - p6.E()*p5.Pz()/p6.Pz())/Dx;
-            const double gamma1 = B1*X/Dx + B2*Y/Dx;
+	    
+	    const double alpha1 = ((E4*p3z - E3*p4z)*(p5z*p6y - p5y*p6z))/
+	                          (p4z*(p3y*p5z*p6x - p3x*p5z*p6y - p3y*p5x*p6z + p3x*p5y*p6z) +
+				   p3z*(-(p4y*p5z*p6x) + p4x*p5z*p6y + p4y*p5x*p6z - p4x*p5y*p6z));
 
-            const double alpha2 = -2*A2*(p3.E() - p4.E()*p3.Pz()/p4.Pz())/Dy;
-            const double beta2 = 2*A1*(p5.E() - p6.E()*p5.Pz()/p6.Pz())/Dy;
-            const double gamma2 = A1*X/Dy + A2*Y/Dy;
+	    const double beta1 = ((p3z*p4y - p3y*p4z)*(E6*p5z - E5*p6z))/
+	                         (p4z*(p3y*p5z*p6x - p3x*p5z*p6y - p3y*p5x*p6z + p3x*p5y*p6z) +
+				  p3z*(-(p4y*p5z*p6x) + p4x*p5z*p6y + p4y*p5x*p6z - p4x*p5y*p6z));
 
-            const double alpha3 = (p4.E() - alpha1*p4.Px() - alpha2*p4.Py())/p4.Pz();
-            const double beta3 = -(beta1*p4.Px() + beta2*p4.Py())/p4.Pz();
-            const double gamma3 = ( 0.5*(*s13 - *s134 + p44) + p34 - gamma1*p4.Px() - gamma2*p4.Py() )/p4.Pz();
+	    const double gamma1 = (2*E5*E6*(-(p3z*p4y) + p3y*p4z)*p5z + p66*(-(p3z*p4y) + p3y*p4z)*p5z + 2*p3z*p4y*p5x*p5z*p6x -
+				   2*p3y*p4z*p5x*p5z*p6x - 
+				   2*E3*E4*p3z*p5z*p6y - p44*p3z*p5z*p6y + 2*p3x*p3z*p4x*p5z*p6y + 2*p3y*p3z*p4y*p5z*p6y +
+				   p33*p4z*p5z*p6y + 2*SQ(p3z)*p4z*p5z*p6y + 2*p3z*p4y*p5y*p5z*p6y - 2*p3y*p4z*p5y*p5z*p6y +
+				   p55*p3z*p4y*p6z - p55*p3y*p4z*p6z + 2*E3*E4*p3z*p5y*p6z + p44*p3z*p5y*p6z -
+				   2*p3x*p3z*p4x*p5y*p6z - 2*p3y*p3z*p4y*p5y*p6z - p33*p4z*p5y*p6z - 2*SQ(p3z)*p4z*p5y*p6z +
+				   2*p3z*p4y*SQ(p5z)*p6z - 2*p3y*p4z*SQ(p5z)*p6z - 2*p3z*p4y*p5z*p6x*ptbx + 2*p3y*p4z*p5z*p6x*ptbx
+				   + 2*p3z*p4y*p5x*p6z*ptbx - 2*p3y*p4z*p5x*p6z*ptbx - 2*p3z*p4y*p5z*p6y*ptby + 2*p3y*p4z*p5z*p6y*ptby +
+				   2*p3z*p4y*p5y*p6z*ptby - 2*p3y*p4z*p5y*p6z*ptby - p3z*p5z*p6y*(*s13) - p4z*p5z*p6y*(*s13) + 
+				   p3z*p5y*p6z*(*s13) + p4z*p5y*p6z*(*s13) + p3z*p5z*p6y*(*s134) - p3z*p5y*p6z*(*s134) - p3z*p4y*p5z*(*s25) +
+				   p3y*p4z*p5z*(*s25) - p3z*p4y*p6z*(*s25) + p3y*p4z*p6z*(*s25) + p3z*p4y*p5z*(*s256) - p3y*p4z*p5z*(*s256))/
+	                          (2*p4z*(-(p3y*p5z*p6x) + p3x*p5z*p6y + p3y*p5x*p6z - p3x*p5y*p6z) +
+	                           2*p3z*(p4y*p5z*p6x - p4x*p5z*p6y - p4y*p5x*p6z + p4x*p5y*p6z));
 
-            const double alpha4 = (alpha1*p6.Px() + alpha2*p6.Py())/p6.Pz();
-            const double beta4 = (p6.E() + beta1*p6.Px() + beta2*p6.Py())/p6.Pz();
-            const double gamma4 = ( 0.5*(*s25 - *s256 + p66) + p56 + (gamma1 + pT.Px())*p6.Px() + (gamma2 + pT.Py())*p6.Py() )/p6.Pz();
 
-            const double alpha5 = -alpha1;
-            const double beta5 = -beta1;
-            const double gamma5 = -pT.Px() - gamma1;
+	    const double alpha2 = ((E4*p3z - E3*p4z)*(p5z*p6x - p5x*p6z))/
+	                          (p4z*(-(p3y*p5z*p6x) + p3x*p5z*p6y + p3y*p5x*p6z - p3x*p5y*p6z) +
+				   p3z*(p4y*p5z*p6x - p4x*p5z*p6y - p4y*p5x*p6z + p4x*p5y*p6z));
 
-            const double alpha6 = -alpha2;
-            const double beta6 = -beta2;
-            const double gamma6 = -pT.Py() - gamma2;
+	    const double beta2 = ((-(p3z*p4x) + p3x*p4z)*(E6*p5z - E5*p6z))/
+	                         (p4z*(p3y*p5z*p6x - p3x*p5z*p6y - p3y*p5x*p6z + p3x*p5y*p6z) +
+				  p3z*(-(p4y*p5z*p6x) + p4x*p5z*p6y + p4y*p5x*p6z - p4x*p5y*p6z));
+
+	    const double gamma2 = (2*E5*E6*(p3z*p4x - p3x*p4z)*p5z + p66*(p3z*p4x - p3x*p4z)*p5z + 2*E3*E4*p3z*p5z*p6x + p44*p3z*p5z*p6x - 
+				   2*p3x*p3z*p4x*p5z*p6x - 2*p3y*p3z*p4y*p5z*p6x - p33*p4z*p5z*p6x - 2*SQ(p3z)*p4z*p5z*p6x -
+				   2*p3z*p4x*p5x*p5z*p6x + 2*p3x*p4z*p5x*p5z*p6x - 2*p3z*p4x*p5y*p5z*p6y + 2*p3x*p4z*p5y*p5z*p6y -
+				   p55*p3z*p4x*p6z + p55*p3x*p4z*p6z - 2*E3*E4*p3z*p5x*p6z - p44*p3z*p5x*p6z + 2*p3x*p3z*p4x*p5x*p6z +
+				   2*p3y*p3z*p4y*p5x*p6z + p33*p4z*p5x*p6z + 2*SQ(p3z)*p4z*p5x*p6z - 2*p3z*p4x*SQ(p5z)*p6z +
+				   2*p3x*p4z*SQ(p5z)*p6z + 2*p3z*p4x*p5z*p6x*ptbx - 2*p3x*p4z*p5z*p6x*ptbx - 2*p3z*p4x*p5x*p6z*ptbx +
+				   2*p3x*p4z*p5x*p6z*ptbx + 2*p3z*p4x*p5z*p6y*ptby - 2*p3x*p4z*p5z*p6y*ptby - 2*p3z*p4x*p5y*p6z*ptby +
+				   2*p3x*p4z*p5y*p6z*ptby + p3z*p5z*p6x*(*s13) + p4z*p5z*p6x*(*s13) - p3z*p5x*p6z*(*s13) -
+				   p4z*p5x*p6z*(*s13) - p3z*p5z*p6x*(*s134) + p3z*p5x*p6z*(*s134) + p3z*p4x*p5z*(*s25) -
+				   p3x*p4z*p5z*(*s25) + p3z*p4x*p6z*(*s25) - p3x*p4z*p6z*(*s25) - p3z*p4x*p5z*(*s256) + p3x*p4z*p5z*(*s256))/
+	                          (2*p4z*(-(p3y*p5z*p6x) + p3x*p5z*p6y + p3y*p5x*p6z - p3x*p5y*p6z) +
+				   2*p3z*(p4y*p5z*p6x - p4x*p5z*p6y - p4y*p5x*p6z + p4x*p5y*p6z));
+
+
+            const double alpha3 = (E4*(p3y*p5z*p6x - p3x*p5z*p6y - p3y*p5x*p6z + p3x*p5y*p6z) +
+				   E3*(-(p4y*p5z*p6x) + p4x*p5z*p6y + p4y*p5x*p6z - p4x*p5y*p6z))/
+	                          (p4z*(p3y*p5z*p6x - p3x*p5z*p6y - p3y*p5x*p6z + p3x*p5y*p6z) +
+				   p3z*(-(p4y*p5z*p6x) + p4x*p5z*p6y + p4y*p5x*p6z - p4x*p5y*p6z));
+
+	    const double beta3 = ((p3y*p4x - p3x*p4y)*(E6*p5z - E5*p6z))/
+	                         (p4z*(p3y*p5z*p6x - p3x*p5z*p6y - p3y*p5x*p6z + p3x*p5y*p6z) +
+				  p3z*(-(p4y*p5z*p6x) + p4x*p5z*p6y + p4y*p5x*p6z - p4x*p5y*p6z));
+
+	    const double gamma3 = (2*E5*E6*(-(p3y*p4x) + p3x*p4y)*p5z + p66*(-(p3y*p4x) + p3x*p4y)*p5z -
+				   2*E3*E4*p3y*p5z*p6x - p44*p3y*p5z*p6x + 2*p3x*p3y*p4x*p5z*p6x + p33*p4y*p5z*p6x +
+				   2*SQ(p3y)*p4y*p5z*p6x + 2*p3y*p3z*p4z*p5z*p6x + 2*p3y*p4x*p5x*p5z*p6x - 
+				   2*p3x*p4y*p5x*p5z*p6x + 2*E3*E4*p3x*p5z*p6y + p44*p3x*p5z*p6y - p33*p4x*p5z*p6y -
+				   2*SQ(p3x)*p4x*p5z*p6y - 2*p3x*p3y*p4y*p5z*p6y - 2*p3x*p3z*p4z*p5z*p6y +
+				   2*p3y*p4x*p5y*p5z*p6y - 2*p3x*p4y*p5y*p5z*p6y + p55*p3y*p4x*p6z - 
+				   p55*p3x*p4y*p6z + 2*E3*E4*p3y*p5x*p6z + p44*p3y*p5x*p6z - 2*p3x*p3y*p4x*p5x*p6z -
+				   p33*p4y*p5x*p6z - 2*SQ(p3y)*p4y*p5x*p6z - 2*p3y*p3z*p4z*p5x*p6z -
+				   2*E3*E4*p3x*p5y*p6z - p44*p3x*p5y*p6z + p33*p4x*p5y*p6z + 
+				   2*SQ(p3x)*p4x*p5y*p6z + 2*p3x*p3y*p4y*p5y*p6z + 2*p3x*p3z*p4z*p5y*p6z + 2*p3y*p4x*SQ(p5z)*p6z - 
+				   2*p3x*p4y*SQ(p5z)*p6z - 2*p3y*p4x*p5z*p6x*ptbx + 2*p3x*p4y*p5z*p6x*ptbx + 2*p3y*p4x*p5x*p6z*ptbx - 
+				   2*p3x*p4y*p5x*p6z*ptbx - 2*p3y*p4x*p5z*p6y*ptby + 2*p3x*p4y*p5z*p6y*ptby + 2*p3y*p4x*p5y*p6z*ptby -
+				   2*p3x*p4y*p5y*p6z*ptby - p3y*p5z*p6x*(*s13) - p4y*p5z*p6x*(*s13) + p3x*p5z*p6y*(*s13) +
+				   p4x*p5z*p6y*(*s13) + p3y*p5x*p6z*(*s13) + p4y*p5x*p6z*(*s13) - p3x*p5y*p6z*(*s13) - 
+				   p4x*p5y*p6z*(*s13) + p3y*p5z*p6x*(*s134) - p3x*p5z*p6y*(*s134) - p3y*p5x*p6z*(*s134) +
+				   p3x*p5y*p6z*(*s134) - p3y*p4x*p5z*(*s25) + p3x*p4y*p5z*(*s25) - p3y*p4x*p6z*(*s25) +
+				   p3x*p4y*p6z*(*s25) + p3y*p4x*p5z*(*s256) - p3x*p4y*p5z*(*s256))/
+	                          (2*p4z*(-(p3y*p5z*p6x) + p3x*p5z*p6y + p3y*p5x*p6z - p3x*p5y*p6z) +
+				   2*p3z*(p4y*p5z*p6x - p4x*p5z*p6y - p4y*p5x*p6z + p4x*p5y*p6z));
+
+
+	    const double alpha4 = ((-(E4*p3z) + E3*p4z)*(p5z*p6y - p5y*p6z))/
+	                          (p4z*(p3y*p5z*p6x - p3x*p5z*p6y - p3y*p5x*p6z + p3x*p5y*p6z) +
+				   p3z*(-(p4y*p5z*p6x) + p4x*p5z*p6y + p4y*p5x*p6z - p4x*p5y*p6z));
+
+	    const double beta4 = ((p3z*p4y - p3y*p4z)*(E6*p5z - E5*p6z))/
+	                         (p4z*(-(p3y*p5z*p6x) + p3x*p5z*p6y + p3y*p5x*p6z - p3x*p5y*p6z) +
+				  p3z*(p4y*p5z*p6x - p4x*p5z*p6y - p4y*p5x*p6z + p4x*p5y*p6z));
+
+	    const double gamma4 = (2*E5*E6*(p3z*p4y - p3y*p4z)*p5z + p66*(p3z*p4y - p3y*p4z)*p5z -
+				   2*p3z*p4y*p5x*p5z*p6x + 2*p3y*p4z*p5x*p5z*p6x + 
+				   2*E3*E4*p3z*p5z*p6y + p44*p3z*p5z*p6y - 2*p3x*p3z*p4x*p5z*p6y - 2*p3y*p3z*p4y*p5z*p6y -
+				   p33*p4z*p5z*p6y - 2*SQ(p3z)*p4z*p5z*p6y - 2*p3z*p4y*p5y*p5z*p6y +
+				   2*p3y*p4z*p5y*p5z*p6y - p55*p3z*p4y*p6z + p55*p3y*p4z*p6z - 2*E3*E4*p3z*p5y*p6z -
+				   p44*p3z*p5y*p6z + 2*p3x*p3z*p4x*p5y*p6z + 2*p3y*p3z*p4y*p5y*p6z + 
+				   p33*p4z*p5y*p6z + 2*SQ(p3z)*p4z*p5y*p6z - 2*p3z*p4y*SQ(p5z)*p6z + 2*p3y*p4z*SQ(p5z)*p6z + 
+				   2*p3z*p4x*p5z*p6y*ptbx - 2*p3x*p4z*p5z*p6y*ptbx - 2*p3z*p4x*p5y*p6z*ptbx +
+				   2*p3x*p4z*p5y*p6z*ptbx + 2*p3z*p4y*p5z*p6y*ptby - 2*p3y*p4z*p5z*p6y*ptby -
+				   2*p3z*p4y*p5y*p6z*ptby + 2*p3y*p4z*p5y*p6z*ptby + p3z*p5z*p6y*(*s13) + p4z*p5z*p6y*(*s13) - 
+				   p3z*p5y*p6z*(*s13) - p4z*p5y*p6z*(*s13) - p3z*p5z*p6y*(*s134) + p3z*p5y*p6z*(*s134) +
+				   p3z*p4y*p5z*(*s25) - p3y*p4z*p5z*(*s25) + p3z*p4y*p6z*(*s25) - 
+				   p3y*p4z*p6z*(*s25) - p3z*p4y*p5z*(*s256) + p3y*p4z*p5z*(*s256))/
+	                          (2*p4z*(-(p3y*p5z*p6x) + p3x*p5z*p6y + p3y*p5x*p6z - p3x*p5y*p6z) +
+				   2*p3z*(p4y*p5z*p6x - p4x*p5z*p6y - p4y*p5x*p6z + p4x*p5y*p6z));
+
+
+	    const double alpha5 = -((E4*p3z - E3*p4z)*(p5z*p6x - p5x*p6z))/
+	                         (p4z*(-(p3y*p5z*p6x) + p3x*p5z*p6y + p3y*p5x*p6z - p3x*p5y*p6z) +
+				  p3z*(p4y*p5z*p6x - p4x*p5z*p6y - p4y*p5x*p6z + p4x*p5y*p6z));
+
+	    const double beta5 = ((p3z*p4x - p3x*p4z)*(E6*p5z - E5*p6z))/
+	                         (p4z*(p3y*p5z*p6x - p3x*p5z*p6y - p3y*p5x*p6z + p3x*p5y*p6z) +
+				  p3z*(-(p4y*p5z*p6x) + p4x*p5z*p6y + p4y*p5x*p6z - p4x*p5y*p6z));
+
+	    const double gamma5 = (2*E5*E6*(-(p3z*p4x) + p3x*p4z)*p5z + p66*(-(p3z*p4x) + p3x*p4z)*p5z -
+				   2*E3*E4*p3z*p5z*p6x - p44*p3z*p5z*p6x + 2*p3x*p3z*p4x*p5z*p6x +
+				   2*p3y*p3z*p4y*p5z*p6x + p33*p4z*p5z*p6x + 2*SQ(p3z)*p4z*p5z*p6x +
+				   2*p3z*p4x*p5x*p5z*p6x - 2*p3x*p4z*p5x*p5z*p6x + 2*p3z*p4x*p5y*p5z*p6y -
+				   2*p3x*p4z*p5y*p5z*p6y + p55*p3z*p4x*p6z - p55*p3x*p4z*p6z + 
+				   2*E3*E4*p3z*p5x*p6z + p44*p3z*p5x*p6z - 2*p3x*p3z*p4x*p5x*p6z -
+				   2*p3y*p3z*p4y*p5x*p6z - p33*p4z*p5x*p6z - 2*SQ(p3z)*p4z*p5x*p6z +
+				   2*p3z*p4x*SQ(p5z)*p6z - 2*p3x*p4z*SQ(p5z)*p6z - 2*p3z*p4x*p5z*p6x*ptbx + 
+				   2*p3x*p4z*p5z*p6x*ptbx + 2*p3z*p4x*p5x*p6z*ptbx - 2*p3x*p4z*p5x*p6z*ptbx -
+				   2*p3z*p4y*p5z*p6x*ptby + 2*p3y*p4z*p5z*p6x*ptby + 2*p3z*p4y*p5x*p6z*ptby -
+				   2*p3y*p4z*p5x*p6z*ptby - p3z*p5z*p6x*(*s13) - p4z*p5z*p6x*(*s13) +
+				   p3z*p5x*p6z*(*s13) + p4z*p5x*p6z*(*s13) + p3z*p5z*p6x*(*s134) -
+				   p3z*p5x*p6z*(*s134) - p3z*p4x*p5z*(*s25) + p3x*p4z*p5z*(*s25) -
+				   p3z*p4x*p6z*(*s25) + p3x*p4z*p6z*(*s25) + p3z*p4x*p5z*(*s256) - p3x*p4z*p5z*(*s256))/
+	                          (2*p4z*(-(p3y*p5z*p6x) + p3x*p5z*p6y + p3y*p5x*p6z - p3x*p5y*p6z) +
+				   2*p3z*(p4y*p5z*p6x - p4x*p5z*p6y - p4y*p5x*p6z + p4x*p5y*p6z));
+
+
+	    const double alpha6 = ((E4*p3z - E3*p4z)*(p5y*p6x - p5x*p6y))/
+	                          (p4z*(-(p3y*p5z*p6x) + p3x*p5z*p6y + p3y*p5x*p6z - p3x*p5y*p6z) +
+				   p3z*(p4y*p5z*p6x - p4x*p5z*p6y - p4y*p5x*p6z + p4x*p5y*p6z));
+
+	    const double beta6 = (E6*(p3z*p4y*p5x - p3y*p4z*p5x - p3z*p4x*p5y + p3x*p4z*p5y) +
+				  E5*(-(p3z*p4y*p6x) + p3y*p4z*p6x + p3z*p4x*p6y - p3x*p4z*p6y))/
+	                         (p4z*(p3y*p5z*p6x - p3x*p5z*p6y - p3y*p5x*p6z + p3x*p5y*p6z) +
+				  p3z*(-(p4y*p5z*p6x) + p4x*p5z*p6y + p4y*p5x*p6z - p4x*p5y*p6z));
+
+	    const double gamma6 = (2*E5*E6*(-(p3z*p4y*p5x) + p3y*p4z*p5x + p3z*p4x*p5y - p3x*p4z*p5y) + 
+				   p66*(-(p3z*p4y*p5x) + p3y*p4z*p5x + p3z*p4x*p5y - p3x*p4z*p5y) +
+				   p55*p3z*p4y*p6x - p55*p3y*p4z*p6x + 2*p3z*p4y*SQ(p5x)*p6x -
+				   2*p3y*p4z*SQ(p5x)*p6x + 2*E3*E4*p3z*p5y*p6x + p44*p3z*p5y*p6x - 
+				   2*p3x*p3z*p4x*p5y*p6x - 2*p3y*p3z*p4y*p5y*p6x - p33*p4z*p5y*p6x -
+				   2*SQ(p3z)*p4z*p5y*p6x - 2*p3z*p4x*p5x*p5y*p6x + 2*p3x*p4z*p5x*p5y*p6x -
+				   p55*p3z*p4x*p6y + p55*p3x*p4z*p6y - 2*E3*E4*p3z*p5x*p6y - p44*p3z*p5x*p6y + 
+				   2*p3x*p3z*p4x*p5x*p6y + 2*p3y*p3z*p4y*p5x*p6y + p33*p4z*p5x*p6y +
+				   2*SQ(p3z)*p4z*p5x*p6y + 2*p3z*p4y*p5x*p5y*p6y - 2*p3y*p4z*p5x*p5y*p6y -
+				   2*p3z*p4x*SQ(p5y)*p6y + 2*p3x*p4z*SQ(p5y)*p6y + 2*p3z*p4y*p5x*p5z*p6z - 
+				   2*p3y*p4z*p5x*p5z*p6z - 2*p3z*p4x*p5y*p5z*p6z + 2*p3x*p4z*p5y*p5z*p6z +
+				   2*p3z*p4x*p5y*p6x*ptbx - 2*p3x*p4z*p5y*p6x*ptbx - 2*p3z*p4x*p5x*p6y*ptbx +
+				   2*p3x*p4z*p5x*p6y*ptbx + 2*p3z*p4y*p5y*p6x*ptby - 2*p3y*p4z*p5y*p6x*ptby -
+				   2*p3z*p4y*p5x*p6y*ptby + 2*p3y*p4z*p5x*p6y*ptby + p3z*p5y*p6x*(*s13) +
+				   p4z*p5y*p6x*(*s13) - p3z*p5x*p6y*(*s13) - p4z*p5x*p6y*(*s13) - p3z*p5y*p6x*(*s134) + 
+				   p3z*p5x*p6y*(*s134) - p3z*p4y*p5x*(*s25) + p3y*p4z*p5x*(*s25) + p3z*p4x*p5y*(*s25) -
+				   p3x*p4z*p5y*(*s25) - p3z*p4y*p6x*(*s25) + p3y*p4z*p6x*(*s25) + 
+				   p3z*p4x*p6y*(*s25) - p3x*p4z*p6y*(*s25) + (p3z*p4y*p5x - p3y*p4z*p5x -
+				   p3z*p4x*p5y + p3x*p4z*p5y)*(*s256))/
+	                          (2*p4z*(-(p3y*p5z*p6x) + p3x*p5z*p6y + p3y*p5x*p6z - p3x*p5y*p6z) +
+				   2*p3z*(p4y*p5z*p6x - p4x*p5z*p6y - p4y*p5x*p6z + p4x*p5y*p6z));
+
 
             // a11 E1^2 + a22 E2^2 + a12 E1E2 + a10 E1 + a01 E2 + a00 = 0
             // id. with bij
@@ -160,9 +302,10 @@ class BlockD: public Module {
                         e2);
 
                 invisibles->push_back({p1, p2});
-                jacobians->push_back(computeJacobian(p1, p2, p3, p4, p5, p6));
-            }
-        }
+                jacobians->push_back(computeJacobian(p1, p2, p3, p4, p5, p6));                   
+ 
+       	    }
+	}
 
         virtual size_t dimensions() const override {
             return 0;
