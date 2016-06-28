@@ -208,7 +208,7 @@ MatrixElement.ttbar = {
       },
 
       {
-        pdg_id = -5,
+        pdg_id = -5, 
         me_index = 6,
       },
     }
@@ -226,4 +226,3 @@ DMEM.dmem_ttbar = {
   invisibles = 'blockd::invisibles',
   integrands = 'ttbar::integrands',
 }
-

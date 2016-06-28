@@ -100,6 +100,7 @@ endif()
 
 set(MOMEMTA_SOURCES
     "modules/BinnedTransferFunctionOnEnergy.cc"
+    "modules/BlockA.cc"
     "modules/BlockB.cc"
     "modules/BlockD.cc"
     "modules/BlockF.cc"
@@ -167,6 +168,8 @@ target_link_libraries(momemta LINK_PRIVATE me_pp_ttx_fully_leptonic)
 target_link_libraries(momemta LINK_PRIVATE "-Wl,--whole-archive $<TARGET_FILE:me_pp_ttx_fully_leptonic> -Wl,--no-whole-archive")
 target_link_libraries(momemta LINK_PRIVATE me_pp_WW_fully_leptonic)
 target_link_libraries(momemta LINK_PRIVATE "-Wl,--whole-archive $<TARGET_FILE:me_pp_WW_fully_leptonic> -Wl,--no-whole-archive")
+target_link_libraries(momemta LINK_PRIVATE me_pp_ZZ_bbbb)
+target_link_libraries(momemta LINK_PRIVATE "-Wl,--whole-archive $<TARGET_FILE:me_pp_ZZ_bbbb> -Wl,--no-whole-archive")
 
 add_library(empty_module SHARED "modules/EmptyModule.cc")
 
@@ -189,6 +192,11 @@ if(EXAMPLES)
     target_link_libraries(example_WW_fullyleptonic momemta)
     set_target_properties(example_WW_fullyleptonic PROPERTIES OUTPUT_NAME
       "WW_fullyleptonic.exe")
+
+    add_executable(example_HH_bbbb "examples/HH_bbbb.cc")
+    target_link_libraries(example_HH_bbbb momemta)
+    set_target_properties(example_HH_bbbb PROPERTIES OUTPUT_NAME
+      "HH_bbbb.exe")
 
 endif()
 
