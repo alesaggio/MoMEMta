@@ -57,15 +57,17 @@ class MatrixElement: public Module {
             LOG(debug) << "[MatrixElement] invisibles jacobians tag: " << invisibles_jacobians_tag.toString();
             m_invisibles_jacobians = get<std::vector<double>>(invisibles_jacobians_tag);
 
-            const auto& invisibles_ids_set = invisibles_set.get<std::vector<ParameterSet>>("ids");
-            LOG(debug) << "[MatrixElement] # invisibles ids: " << invisibles_ids_set.size();
-            for (const auto& s: invisibles_ids_set) {
-                ParticleId id;
-                id.pdg_id = s.get<int64_t>("pdg_id");
-                id.me_index = s.get<int64_t>("me_index");
-                m_invisibles_ids.push_back(id);
+            if(m_invisibles->size()!=0){
+                const auto& invisibles_ids_set = invisibles_set.get<std::vector<ParameterSet>>("ids");
+                LOG(debug) << "[MatrixElement] # invisibles ids: " << invisibles_ids_set.size();
+                    for (const auto& s: invisibles_ids_set) {
+                    ParticleId id;
+                    id.pdg_id = s.get<int64_t>("pdg_id");
+                    id.me_index = s.get<int64_t>("me_index");
+                    m_invisibles_ids.push_back(id);
+                    }
             }
-
+            
             const auto& particles_set = parameters.get<ParameterSet>("particles");
 
             m_particles_tags = particles_set.get<std::vector<InputTag>>("inputs");
@@ -184,7 +186,8 @@ class MatrixElement: public Module {
                 double pdf1 = use_pdf ? m_pdf->xfxQ2(me.first.first, x1, pdf_scale_squared) / x1 : 1;
                 double pdf2 = use_pdf ? m_pdf->xfxQ2(me.first.second, x2, pdf_scale_squared) / x2 : 1;
 
-                final_integrand += me.second * pdf1 * pdf2;
+                //final_integrand += me.second * pdf1 * pdf2;
+                final_integrand += 1 * pdf1 * pdf2;
             }
 
             final_integrand *= integrand;

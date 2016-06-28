@@ -100,6 +100,7 @@ endif()
 
 set(MOMEMTA_SOURCES
     "modules/BinnedTransferFunctionOnEnergy.cc"
+    "modules/BlockA.cc"
     "modules/BlockB.cc"
     "modules/BlockD.cc"
     "modules/BlockF.cc"
@@ -189,6 +190,11 @@ if(EXAMPLES)
     target_link_libraries(example_WW_fullyleptonic momemta)
     set_target_properties(example_WW_fullyleptonic PROPERTIES OUTPUT_NAME
       "WW_fullyleptonic.exe")
+
+    add_executable(example_HH_bbbb "examples/HH_bbbb.cc")
+    target_link_libraries(example_HH_bbbb momemta)
+    set_target_properties(example_HH_bbbb PROPERTIES OUTPUT_NAME
+      "HH_bbbb.exe")
 
 endif()
 
