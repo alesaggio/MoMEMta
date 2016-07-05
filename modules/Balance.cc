@@ -80,21 +80,12 @@
  * \ingroup modules
  */
 
-class BlockA: public Module {
+class Balance: public Module {
     public:
   
-        BlockA(PoolPtr pool, const ParameterSet& parameters): Module(pool, parameters.getModuleName()) {
+        Balance(PoolPtr pool, const ParameterSet& parameters): Module(pool, parameters.getModuleName()) {
 
             sqrt_s = parameters.globalParameters().get<double>("energy");
-
-            m_ps_point1 = parameters.get<InputTag>("theta1");
-            m_ps_point1.resolve(pool);
-            m_ps_point2 = parameters.get<InputTag>("phi1");
-            m_ps_point2.resolve(pool);
-            m_ps_point3 = parameters.get<InputTag>("theta2");
-            m_ps_point3.resolve(pool);
-            m_ps_point4 = parameters.get<InputTag>("phi2");
-            m_ps_point4.resolve(pool);
                         
             m_particle_tags = parameters.get<std::vector<InputTag>>("inputs");
             for (auto& t: m_particle_tags)
@@ -106,25 +97,26 @@ class BlockA: public Module {
             invisibles->clear();
             jacobians->clear();
 
-            const LorentzVector& p3 = m_particle_tags[0].get<LorentzVector>();
-            const LorentzVector& p4 = m_particle_tags[1].get<LorentzVector>();
-
-            std::cout << "p3.px(): " << p3.Px() << std::endl;
-            std::cout << "p3.Theta(): " << p3.Theta() << std::endl;
-            std::cout << "p3.Phi(): " << p3.Phi() << std::endl;
+            const LorentzVector& p1 = m_particle_tags[0].get<LorentzVector>();
+            const LorentzVector& p2 = m_particle_tags[1].get<LorentzVector>();
+            const LorentzVector& p3 = m_particle_tags[2].get<LorentzVector>();
+            const LorentzVector& p4 = m_particle_tags[3].get<LorentzVector>();
 
             LorentzVector pb = p3+p4;
-            for (size_t i = 2; i < m_particle_tags.size(); i++) {
-                pb += m_particle_tags[i].get<LorentzVector>();
-            }
-
-            const double pbx = pb.Px();
-            const double pby = pb.Py();
-
-            double theta1 = m_ps_point1.get<double>()*M_PI;
-            double phi1 = m_ps_point2.get<double>()*2*M_PI;
-            double theta2 = m_ps_point3.get<double>()*M_PI;
-            double phi2 = m_ps_point4.get<double>()*2*M_PI;
+            //for (size_t i = 2; i < m_particle_tags.size(); i++) {
+            //    pb += m_particle_tags[i].get<LorentzVector>();
+            //}
+std::cout << p1.Px() << std::endl;
+std::cout << p2.Px() << std::endl;
+std::cout << p3.Px() << std::endl;
+std::cout << p4.Px() << std::endl;
+            double pbx = pb.Px();
+            double pby = pb.Py();
+            std::cout << "pbx: " << pbx << std::endl;
+            const double theta1 = p1.Theta();
+            const double phi1 = p1.Phi();
+            const double theta2 = p2.Theta();
+            const double phi2 = p2.Phi();
 
             //pT = p1+p2+pb. Balance it with the following system:
             //p1x+p2x = -pbx
@@ -133,35 +125,42 @@ class BlockA: public Module {
             //       p2x=modp2*sin(theta2)*cos(phi2), p2y=modp2*sin(theta2)*sin(phi2)
             //Get modp1, modp2 as solutions of this system
 
-            const double modp1 = -pbx/(std::sin(theta1)*std::cos(phi1)) - (std::cos(phi2)/(std::sin(theta1)*std::sin(phi2-phi1)))*(pbx*std::tan(phi1)-pby);
-            const double modp2 = (pbx*std::sin(phi1)-pby*std::cos(phi1))/(std::sin(theta2)*std::sin(phi2-phi1));
-
-            LorentzVector p1(modp1*std::sin(theta1)*std::cos(phi1), modp1*std::sin(theta1)*std::sin(phi1), modp1*std::cos(theta1), modp1);
-            LorentzVector p2(modp2*std::sin(theta2)*std::cos(phi2), modp2*std::sin(theta2)*std::sin(phi2), modp2*std::cos(theta2), modp2);
-            main_particles->push_back(p1);
-            main_particles->push_back(p2);
-
-            //if (modp1 < 0)
-            //    return;
-            //  if (modp2 < 0)
-            //    return;
+            if (pbx<0)
+              pbx = -pbx;
+            if (pby<0)
+              pby = -pby;
+            double modp1 = -pbx/(std::sin(theta1)*std::cos(phi1)) - (std::cos(phi2)/(std::sin(theta1)*std::sin(phi2-phi1)))*(pbx*std::tan(phi1)-pby);
+            double modp2 = (pbx*std::sin(phi1)-pby*std::cos(phi1))/(std::sin(theta2)*std::sin(phi2-phi1));
+ 
+            
+            LorentzVector p1_balanced(modp1*std::sin(theta1)*std::cos(phi1), modp1*std::sin(theta1)*std::sin(phi1), modp1*std::cos(theta1), modp1);
+            LorentzVector p2_balanced(modp2*std::sin(theta2)*std::cos(phi2), modp2*std::sin(theta2)*std::sin(phi2), modp2*std::cos(theta2), modp2);
+            
+            *particle1 = p1_balanced;
+            *particle2 = p2_balanced;
+            *particle3 = p3;
+            *particle4 = p4;
 
             std::cout << "|p1|: " << modp1 << std::endl;
             std::cout << "|p2|: " << modp2 << std::endl;
-            std::cout << "p1.Px(): " << p1.Px() << std::endl;
-            std::cout << "p2.Py(): " << p2.Py() << std::endl;
-            
-            if (p1.E()<0 || p2.E()<0)
-                return;
+            std::cout << "p1.Px(): " << particle1->Px() << std::endl;
+            std::cout << "p2.Px(): " << particle2->Px() << std::endl;
+            std::cout << "p3.Px(): " << particle3->Px() << std::endl;
+            std::cout << "p4.Px(): " << particle4->Px() << std::endl;
 
+            std::cout << "SUM: " << particle1->Px()+particle2->Px()+particle3->Px()+particle4->Px() << std::endl;
+
+            if(modp1<0 || modp2<0)
+              std::cout << "negative modules!" << std::endl;
             invisibles->push_back({});
-            jacobians->push_back(computeJacobian(p1, p2));
+            jacobians->push_back(1.);
+            
             }
        
 
         // The extra dimensions not present in the input
         virtual size_t dimensions() const override {
-            return 4;
+            return 0;
         }
  
         double computeJacobian(const LorentzVector& p1, const LorentzVector& p2) {
@@ -189,6 +188,9 @@ class BlockA: public Module {
 
         std::shared_ptr<std::vector<std::vector<LorentzVector>>> invisibles = produce<std::vector<std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double>>>>>("invisibles");
         std::shared_ptr<std::vector<double>> jacobians = produce<std::vector<double>>("jacobians");
-        std::shared_ptr<std::vector<LorentzVector>> main_particles = produce<std::vector<LorentzVector>>("main_particles");
+        std::shared_ptr<LorentzVector> particle1 = produce<LorentzVector>("particle1");
+        std::shared_ptr<LorentzVector> particle2 = produce<LorentzVector>("particle2");
+        std::shared_ptr<LorentzVector> particle3 = produce<LorentzVector>("particle3");
+        std::shared_ptr<LorentzVector> particle4 = produce<LorentzVector>("particle4");
 };
-REGISTER_MODULE(BlockA);
+REGISTER_MODULE(Balance);

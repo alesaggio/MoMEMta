@@ -74,7 +74,7 @@ class BuildInitialState: public Module {
             } else {
                 do_compute_initials = compute_initials_trivial;
             }
-            
+
             std::vector<InputTag> invisibles_tag = parameters.get<std::vector<InputTag>>("invisibles");
             for (const auto& tag: invisibles_tag) {
                 invisibles.push_back(get<std::vector<std::vector<LorentzVector>>>(tag));
@@ -91,7 +91,7 @@ class BuildInitialState: public Module {
 
             std::vector<LorentzVector> particles;
             for (auto& p: input_particles) {
-                particles.push_back(p.get<LorentzVector>());
+            particles.push_back(p.get<LorentzVector>());
             }
 
             if (!invisibles.empty()) {
