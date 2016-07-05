@@ -39,13 +39,15 @@ int main(int argc, char** argv) {
 
     MoMEMta weight(configuration.freeze());
 
+    LorentzVector p1(16.171895980835, -13.7919054031372, -3.42997527122497, 21.5293197631836);
+    LorentzVector p2(-18.9018573760986, 10.0896110534668, -0.602926552295686, 21.4346446990967);
     // b-quark
     LorentzVector p3(-55.7908325195313, -111.59294128418, -122.144721984863, 174.66259765625);
     // Anti b-quark
     LorentzVector p4(71.3899612426758, 96.0094833374023, -77.2513122558594, 142.492813110352);
 
     auto start_time = system_clock::now();
-    std::vector<std::pair<double, double>> weights = weight.computeWeights({p3, p4});
+    std::vector<std::pair<double, double>> weights = weight.computeWeights({p1, p2, p3, p4});
     auto end_time = system_clock::now();
 
     LOG(debug) << "Result:";

@@ -12,6 +12,8 @@ USE_TF = true
 if USE_TF then
     -- With transfer functions
     inputs_before_perm = {
+        'tf_p1::output',
+        'tf_p2::output',
         'tf_p3::output',
         'tf_p4::output',
     }
@@ -48,15 +50,27 @@ cuba = {
 }
 
 if USE_TF then
-     GaussianTransferFunction.tf_p3 = {
+     GaussianTransferFunction.tf_p1 = {
         ps_point = getpspoint(),
         reco_particle = 'input::particles/1',
         sigma = 0.05,
      }
 
-     GaussianTransferFunction.tf_p4 = {
+    GaussianTransferFunction.tf_p2 = {
         ps_point = getpspoint(),
         reco_particle = 'input::particles/2',
+        sigma = 0.10,
+     }
+
+     GaussianTransferFunction.tf_p3 = {
+        ps_point = getpspoint(),
+        reco_particle = 'input::particles/3',
+        sigma = 0.05,
+     }
+
+     GaussianTransferFunction.tf_p4 = {
+        ps_point = getpspoint(),
+        reco_particle = 'input::particles/4',
         sigma = 0.10,
      }
 end
@@ -71,41 +85,27 @@ if USE_PERM then
     }
 end
 
-BlockA.blocka = {
+Balance.balance = {
     inputs = inputs,
-
-    theta1 = getpspoint(),
-    theta2 = getpspoint(),
-    phi1 = getpspoint(),
-    phi2 = getpspoint()
 }
 
 BuildInitialState.boost = {
     invisibles = {
-        'blocka::invisibles',
+        'balance::invisibles',
     },
 
     do_transverse_boost = true,
 
-    particles = inputs
+    particles = {
+        'balance::particle1',
+        'balance::particle2',
+        'balance::particle3',
+        'balance::particle4',
+    }
 }
 
-jacobians = {'tf_p3::TF_times_jacobian', 'tf_p4::TF_times_jacobian'}
+jacobians = {'tf_p1::TF_times_jacobian', 'tf_p2::TF_times_jacobian', 'tf_p3::TF_times_jacobian', 'tf_p4::TF_times_jacobian'}
 
-
--- GaussianTransferFunction.tf_p1 = {
---    ps_point = getpspoint(),
---    reco_particle = 'blocka::main_particles/1',
---    sigma = 0.05,
---}
-
---GaussianTransferFunction.tf_p2 = {
---    ps_point = getpspoint(),
---    reco_particle = 'blocka::main_particles/2',
---    sigma = 0.10,
---}
-
---append(jacobians, {'tf_p1::TF_times_jacobian', 'tf_p2::TF_times_jacobian'})
 
 MatrixElement.ZZ_bbbb = {
   pdf = 'CT10nlo',
@@ -119,12 +119,17 @@ MatrixElement.ZZ_bbbb = {
   initialState = 'boost::output',
 
   invisibles = {
-    input = 'blocka::invisibles',
-    jacobians = 'blocka::jacobians',
+    input = 'balance::invisibles',
+    jacobians = 'balance::jacobians',  --in doubt...
   },
 
   particles = {
-    inputs = inputs,
+    inputs = {
+        'balance::particle1',
+        'balance::particle2',
+        'balance::particle3',
+        'balance::particle4',
+    },
     ids = {
       {
         pdg_id = 5,

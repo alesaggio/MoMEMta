@@ -44,20 +44,24 @@ class MatrixElement: public Module {
             sqrt_s = parameters.globalParameters().get<double>("energy");
 
             use_pdf = parameters.get<bool>("use_pdf", true);
-
+            std::cout << "before calling InitialState in ME" << std::endl;
             m_partons = get<std::vector<std::vector<LorentzVector>>>(parameters.get<InputTag>("initialState"));
 
             const auto& invisibles_set = parameters.get<ParameterSet>("invisibles");
-
+            std::cout << "AAA" << std::endl;
             InputTag invisibles_tag = invisibles_set.get<InputTag>("input");
             LOG(debug) << "[MatrixElement] invisibles input tag: " << invisibles_tag.toString();
             m_invisibles = get<std::vector<std::vector<LorentzVector>>>(invisibles_tag);
-
+            std::cout << "BBB" << std::endl;
             const auto& invisibles_jacobians_tag = invisibles_set.get<InputTag>("jacobians");
             LOG(debug) << "[MatrixElement] invisibles jacobians tag: " << invisibles_jacobians_tag.toString();
+            std::cout << "CCC" << std::endl;
             m_invisibles_jacobians = get<std::vector<double>>(invisibles_jacobians_tag);
-
+            std::cout << "DDD" << std::endl;
+            std::cout << "m_invisibles->size(): " << m_invisibles->size() << std::endl;
+            std::cout << "m_invisbles_jacobians->size(): " << m_invisibles_jacobians->size() << std::endl;
             if(m_invisibles->size()!=0){
+            std::cout << "EEE" << std::endl;
                 const auto& invisibles_ids_set = invisibles_set.get<std::vector<ParameterSet>>("ids");
                 LOG(debug) << "[MatrixElement] # invisibles ids: " << invisibles_ids_set.size();
                     for (const auto& s: invisibles_ids_set) {
@@ -158,7 +162,7 @@ class MatrixElement: public Module {
             auto permutations = get_permutations(suite, indexing);
             apply_permutations(finalStates, permutations);
 
-            std::pair<std::vector<double>, std::vector<double>> initialState { toVector(partons[0]), toVector(partons[1]) };
+            std::pair<std::vector<double>, std::vector<double>> initialState { toVector(partons[0]), toVector(partons[0]) };
 
             auto result = m_ME->compute(initialState, finalStates);
 
