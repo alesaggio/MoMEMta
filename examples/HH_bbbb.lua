@@ -12,8 +12,8 @@ USE_TF = true
 if USE_TF then
     -- With transfer functions
     inputs_before_perm = {
-        'tf_p1::output',
-        'tf_p2::output',
+        'input::particles/1',
+        'input::particles/2',
         'tf_p3::output',
         'tf_p4::output',
     }
@@ -45,23 +45,21 @@ parameters = {
 }
 
 cuba = {
-    relative_accuracy = 0.01,
+    relative_accuracy = 0.00001,
     verbosity = 3
 }
 
 if USE_TF then
      GaussianTransferFunction.tf_p1 = {
         ps_point = getpspoint(),
-        reco_particle = 'input::particles/1',
+        reco_particle = 'balance::particle1',
         sigma = 0.05,
      }
-
-    GaussianTransferFunction.tf_p2 = {
+     GaussianTransferFunction.tf_p2 = {
         ps_point = getpspoint(),
-        reco_particle = 'input::particles/2',
-        sigma = 0.10,
+        reco_particle = 'balance::particle2',
+        sigma = 0.05,
      }
-
      GaussianTransferFunction.tf_p3 = {
         ps_point = getpspoint(),
         reco_particle = 'input::particles/3',
@@ -86,7 +84,7 @@ if USE_PERM then
 end
 
 Balance.balance = {
-    inputs = inputs,
+    inputs = inputs
 }
 
 BuildInitialState.boost = {
