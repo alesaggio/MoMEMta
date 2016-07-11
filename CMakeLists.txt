@@ -111,6 +111,7 @@ set(MOMEMTA_SOURCES
     "modules/FlatTransferFunctionOnPhi.cc"
     "modules/FlatTransferFunctionOnTheta.cc"
     "modules/GaussianTransferFunction.cc"
+    "modules/TransferFunctionEvaluator.cc"
     "modules/MatrixElement.cc"
     "modules/NarrowWidthApproximation.cc"
     "modules/Permutator.cc"
