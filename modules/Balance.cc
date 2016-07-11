@@ -106,6 +106,7 @@ class Balance: public Module {
             //for (size_t i = 2; i < m_particle_tags.size(); i++) {
             //    pb += m_particle_tags[i].get<LorentzVector>();
             //}
+            std::cout << "--------------------" << std::endl;
 std::cout << p1.Px() << std::endl;
 std::cout << p2.Px() << std::endl;
 std::cout << p3.Px() << std::endl;
@@ -118,17 +119,13 @@ std::cout << p4.Px() << std::endl;
             const double theta2 = p2.Theta();
             const double phi2 = p2.Phi();
 
-            //pT = p1+p2+pb. Balance it with the following system:
+            //pT = p1+p2+pb = 0. Balance it with the following system:
             //p1x+p2x = -pbx
             //p1y+p2y = -pby,
             //where: p1x=modp1*sin(theta1)*cos(phi1), p1y=modp1*sin(theta1)*sin(phi1),
             //       p2x=modp2*sin(theta2)*cos(phi2), p2y=modp2*sin(theta2)*sin(phi2)
             //Get modp1, modp2 as solutions of this system
 
-            if (pbx<0)
-              pbx = -pbx;
-            if (pby<0)
-              pby = -pby;
             double modp1 = -pbx/(std::sin(theta1)*std::cos(phi1)) - (std::cos(phi2)/(std::sin(theta1)*std::sin(phi2-phi1)))*(pbx*std::tan(phi1)-pby);
             double modp2 = (pbx*std::sin(phi1)-pby*std::cos(phi1))/(std::sin(theta2)*std::sin(phi2-phi1));
  
@@ -148,12 +145,16 @@ std::cout << p4.Px() << std::endl;
             std::cout << "p3.Px(): " << particle3->Px() << std::endl;
             std::cout << "p4.Px(): " << particle4->Px() << std::endl;
 
-            std::cout << "SUM: " << particle1->Px()+particle2->Px()+particle3->Px()+particle4->Px() << std::endl;
+            std::cout << "SUM: " << particle1->Py()+particle2->Py()+particle3->Py()+particle4->Py() << std::endl;
 
             if(modp1<0 || modp2<0)
               std::cout << "negative modules!" << std::endl;
+
+            double inv_jac = (modp1*modp2)/(8*SQ(M_PI*sqrt_s));
+            inv_jac *= 1/std::abs(std::sin(phi2-phi1));
+
             invisibles->push_back({});
-            jacobians->push_back(1.);
+            jacobians->push_back(inv_jac);
             
             }
        
@@ -180,11 +181,6 @@ std::cout << p4.Px() << std::endl;
         double sqrt_s;
 
         std::vector<InputTag> m_particle_tags;
-
-        InputTag m_ps_point1;
-        InputTag m_ps_point2;
-        InputTag m_ps_point3;
-        InputTag m_ps_point4;
 
         std::shared_ptr<std::vector<std::vector<LorentzVector>>> invisibles = produce<std::vector<std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double>>>>>("invisibles");
         std::shared_ptr<std::vector<double>> jacobians = produce<std::vector<double>>("jacobians");

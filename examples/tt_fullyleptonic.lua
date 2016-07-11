@@ -163,6 +163,8 @@ if USE_TF then
 end
 
 MatrixElement.ttbar = {
+  use_blockA = false,
+
   pdf = 'CT10nlo',
   pdf_scale = parameter('top_mass'),
 

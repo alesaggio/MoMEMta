@@ -63,15 +63,15 @@
  * 
  * \ingroup modules
  */
-class GaussianTransferFunction: public Module {
+class TransferFunctionEvaluator: public Module {
     public:
 
-        GaussianTransferFunction(PoolPtr pool, const ParameterSet& parameters): Module(pool, parameters.getModuleName()) {
-            m_ps_point = parameters.get<InputTag>("ps_point");
-            m_input = parameters.get<InputTag>("reco_particle");
+        TransferFunctionEvaluator(PoolPtr pool, const ParameterSet& parameters): Module(pool, parameters.getModuleName()) {
+            m_input1 = parameters.get<InputTag>("reco_particle");
+            m_input2 = parameters.get<InputTag>("gen_particle");
 
-            m_ps_point.resolve(pool);
-            m_input.resolve(pool);
+            m_input1.resolve(pool);
+            m_input2.resolve(pool);
 
             m_sigma = parameters.get<double>("sigma", 0.10);
             m_sigma_range = parameters.get<double>("sigma_range", 5);
@@ -79,41 +79,33 @@ class GaussianTransferFunction: public Module {
 
         virtual void work() override {
 
-            const double& ps_point = m_ps_point.get<double>();
-            const LorentzVector& reco_particle = m_input.get<LorentzVector>();
+            const LorentzVector& reco_particle = m_input1.get<LorentzVector>();
+            const LorentzVector& gen_particle = m_input2.get<LorentzVector>();
 
             double sigma = reco_particle.E() * m_sigma;
 
-            double range_min = std::max(0., reco_particle.E() - (m_sigma_range * sigma));
-            double range_max = reco_particle.E() + (m_sigma_range * sigma);
-            double range = (range_max - range_min);
+            //double range_min = std::max(0., reco_particle.E() - (m_sigma_range * sigma));
+            //double range_max = reco_particle.E() + (m_sigma_range * sigma);
+            //double range = (range_max - range_min);
 
-            double gen_E = range_min + (range * ps_point);
-            double gen_pt = std::sqrt(SQ(gen_E) - SQ(reco_particle.M())) / std::cosh(reco_particle.Eta());
+            double gen_E = gen_particle.E();
 
-            output->SetCoordinates(
-                    gen_pt * std::cos(reco_particle.Phi()),
-                    gen_pt * std::sin(reco_particle.Phi()),
-                    gen_pt * std::sinh(reco_particle.Eta()),
-                    gen_E);
-
-            // Compute jacobian
-            *TF_times_jacobian = ROOT::Math::normal_pdf(gen_E, sigma, reco_particle.E()) * range * dE_over_dP(*output);
+            // Compute TF
+            *TF = ROOT::Math::normal_pdf(gen_E, sigma, reco_particle.E());
         }
 
         virtual size_t dimensions() const override {
-            return 1;
+            return 0;
         }
 
     private:
-        InputTag m_ps_point;
-        InputTag m_input;
+        InputTag m_input1;
+        InputTag m_input2;
 
         double m_sigma;
         double m_sigma_range;
 
-        std::shared_ptr<LorentzVector> output = produce<LorentzVector>("output");
-        std::shared_ptr<double> TF_times_jacobian = produce<double>("TF_times_jacobian");
+        std::shared_ptr<double> TF = produce<double>("TF");
 
 };
-REGISTER_MODULE(GaussianTransferFunction);
+REGISTER_MODULE(TransferFunctionEvaluator);

@@ -45,27 +45,26 @@ parameters = {
 }
 
 cuba = {
-    relative_accuracy = 0.00001,
+    relative_accuracy = 0.0001,
     verbosity = 3
 }
 
 if USE_TF then
-     GaussianTransferFunction.tf_p1 = {
-        ps_point = getpspoint(),
-        reco_particle = 'balance::particle1',
+     TransferFunctionEvaluator.tf_p1 = {
+        reco_particle = 'input::particles/1',
+        gen_particle = 'balance::particle1',
         sigma = 0.05,
      }
-     GaussianTransferFunction.tf_p2 = {
-        ps_point = getpspoint(),
-        reco_particle = 'balance::particle2',
-        sigma = 0.05,
+     TransferFunctionEvaluator.tf_p2 = {
+        reco_particle = 'input::particles/2',
+        gen_particle = 'balance::particle2',
+        sigma = 0.10,
      }
      GaussianTransferFunction.tf_p3 = {
         ps_point = getpspoint(),
         reco_particle = 'input::particles/3',
         sigma = 0.05,
      }
-
      GaussianTransferFunction.tf_p4 = {
         ps_point = getpspoint(),
         reco_particle = 'input::particles/4',
@@ -84,7 +83,12 @@ if USE_PERM then
 end
 
 Balance.balance = {
-    inputs = inputs
+    inputs = {
+        'input::particles/1',
+        'input::particles/2',
+        'tf_p3::output',
+        'tf_p4::output',
+    }
 }
 
 BuildInitialState.boost = {
@@ -102,7 +106,7 @@ BuildInitialState.boost = {
     }
 }
 
-jacobians = {'tf_p1::TF_times_jacobian', 'tf_p2::TF_times_jacobian', 'tf_p3::TF_times_jacobian', 'tf_p4::TF_times_jacobian'}
+jacobians = {'tf_p1::TF', 'tf_p2::TF', 'tf_p3::TF_times_jacobian', 'tf_p4::TF_times_jacobian'}
 
 
 MatrixElement.ZZ_bbbb = {
@@ -110,6 +114,8 @@ MatrixElement.ZZ_bbbb = {
   pdf_scale = parameter('Z_mass'),  --correct?
 
   matrix_element = 'pp_ZZ_bbbb_sm_P1_Sigma_sm_uux_bbxbbx',
+
+
   matrix_element_parameters = {
       card = '../MatrixElements/Cards/param_card.dat'
   },
@@ -118,7 +124,7 @@ MatrixElement.ZZ_bbbb = {
 
   invisibles = {
     input = 'balance::invisibles',
-    jacobians = 'balance::jacobians',  --in doubt...
+    jacobians = 'balance::jacobians',
   },
 
   particles = {

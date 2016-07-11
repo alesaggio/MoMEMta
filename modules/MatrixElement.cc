@@ -44,6 +44,7 @@ class MatrixElement: public Module {
             sqrt_s = parameters.globalParameters().get<double>("energy");
 
             use_pdf = parameters.get<bool>("use_pdf", true);
+            use_blockA = parameters.get<bool>("use_blockA");
             std::cout << "before calling InitialState in ME" << std::endl;
             m_partons = get<std::vector<std::vector<LorentzVector>>>(parameters.get<InputTag>("initialState"));
 
@@ -60,8 +61,9 @@ class MatrixElement: public Module {
             std::cout << "DDD" << std::endl;
             std::cout << "m_invisibles->size(): " << m_invisibles->size() << std::endl;
             std::cout << "m_invisbles_jacobians->size(): " << m_invisibles_jacobians->size() << std::endl;
-            if(m_invisibles->size()!=0){
-            std::cout << "EEE" << std::endl;
+
+            if(!use_blockA){
+                std::cout << "EEE" << std::endl;
                 const auto& invisibles_ids_set = invisibles_set.get<std::vector<ParameterSet>>("ids");
                 LOG(debug) << "[MatrixElement] # invisibles ids: " << invisibles_ids_set.size();
                     for (const auto& s: invisibles_ids_set) {
@@ -201,6 +203,7 @@ class MatrixElement: public Module {
     private:
         double sqrt_s;
         bool use_pdf;
+        bool use_blockA;
         double pdf_scale_squared = 0;
 
         std::shared_ptr<const std::vector<std::vector<LorentzVector>>> m_partons;

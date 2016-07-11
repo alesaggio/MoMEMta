@@ -90,6 +90,8 @@ if USE_TF then
 end
 
 MatrixElement.WW = {
+  use_blockA = false,
+
   pdf = 'CT10nlo',
   pdf_scale = parameter('W_mass'),
 
