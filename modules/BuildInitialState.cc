@@ -79,10 +79,14 @@ class BuildInitialState: public Module {
             for (const auto& tag: invisibles_tag) {
                 invisibles.push_back(get<std::vector<std::vector<LorentzVector>>>(tag));
             }
-
+std::cout << "invisibles: " << invisibles.size() << std::endl;
             input_particles = parameters.get<std::vector<InputTag>>("particles");
             for (auto& t: input_particles)
                 t.resolve(pool);
+
+            use_blockA = parameters.get<bool>("use_blockA");
+
+
         };
 
         virtual void work() override {
@@ -94,8 +98,7 @@ class BuildInitialState: public Module {
             particles.push_back(p.get<LorentzVector>());
             }
 
-            if (!invisibles.empty()) {
-
+            if (!invisibles.empty() || !use_blockA) {
                 size_t n_sols = invisibles.front()->size();
                 for (const auto& i: invisibles) {
                     if (i->size() != n_sols) {
@@ -175,6 +178,7 @@ class BuildInitialState: public Module {
 
         std::vector<std::shared_ptr<const std::vector<std::vector<LorentzVector>>>> invisibles;
         std::vector<InputTag> input_particles;
+        bool use_blockA;
 
         std::shared_ptr<std::vector<std::vector<LorentzVector>>> output = produce<std::vector<std::vector<LorentzVector>>>("output");
 };

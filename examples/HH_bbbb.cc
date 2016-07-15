@@ -22,8 +22,6 @@
 #include <momemta/MoMEMta.h>
 #include <momemta/Utils.h>
 
-#include <TH1D.h>
-
 #include <chrono>
 
 using namespace std::chrono;
@@ -39,7 +37,9 @@ int main(int argc, char** argv) {
 
     MoMEMta weight(configuration.freeze());
 
+    // b-quark
     LorentzVector p1(15.68735, -189.8133, -210.1001, 288.65808);
+    // Anti b-quark
     LorentzVector p2(-81.89723, -59.53946, -75.95126, 127.12102);
     // b-quark
     LorentzVector p3(84.728727, 127.45076, -243.5151, 289.04342);

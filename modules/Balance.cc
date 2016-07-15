@@ -24,6 +24,7 @@
 
 #include <TMath.h>
 
+//FIX DOCUMENTATION
 /** \brief \f$\require{cancel}\f$ Final (main) Block B, describing \f$q_1 q_2 \to X + s_{12} (\to \cancel{p_1} p_2)\f$
  *
  * \f$q_1\f$ and \f$q_2\f$ are Bjorken fractions, and \f$s_{12}\f$ is a particle decaying 
@@ -106,14 +107,8 @@ class Balance: public Module {
             //for (size_t i = 2; i < m_particle_tags.size(); i++) {
             //    pb += m_particle_tags[i].get<LorentzVector>();
             //}
-            std::cout << "--------------------" << std::endl;
-std::cout << p1.Px() << std::endl;
-std::cout << p2.Px() << std::endl;
-std::cout << p3.Px() << std::endl;
-std::cout << p4.Px() << std::endl;
             double pbx = pb.Px();
             double pby = pb.Py();
-            std::cout << "pbx: " << pbx << std::endl;
             const double theta1 = p1.Theta();
             const double phi1 = p1.Phi();
             const double theta2 = p2.Theta();
@@ -138,24 +133,11 @@ std::cout << p4.Px() << std::endl;
             *particle3 = p3;
             *particle4 = p4;
 
-            std::cout << "|p1|: " << modp1 << std::endl;
-            std::cout << "|p2|: " << modp2 << std::endl;
-            std::cout << "p1.Px(): " << particle1->Px() << std::endl;
-            std::cout << "p2.Px(): " << particle2->Px() << std::endl;
-            std::cout << "p3.Px(): " << particle3->Px() << std::endl;
-            std::cout << "p4.Px(): " << particle4->Px() << std::endl;
-
-            std::cout << "SUM: " << particle1->Py()+particle2->Py()+particle3->Py()+particle4->Py() << std::endl;
-
-            if(modp1<0 || modp2<0)
-              std::cout << "negative modules!" << std::endl;
-
             double inv_jac = (modp1*modp2)/(8*SQ(M_PI*sqrt_s));
             inv_jac *= 1/std::abs(std::sin(phi2-phi1));
 
             invisibles->push_back({});
             jacobians->push_back(inv_jac);
-            
             }
        
 
@@ -164,18 +146,18 @@ std::cout << p4.Px() << std::endl;
             return 0;
         }
  
-        double computeJacobian(const LorentzVector& p1, const LorentzVector& p2) {
+        //double computeJacobian(const LorentzVector& p1, const LorentzVector& p2) {
 
             //WARNING: we're considering the bjets massless --> E=|p|
-            const double E1 = p1.E();
-            const double E2 = p2.E();
-            const double phi1 = p1.Phi();
-            const double phi2 = p2.Phi();
+            //const double E1 = p1.E();
+            //const double E2 = p2.E();
+            //const double phi1 = p1.Phi();
+            //const double phi2 = p2.Phi();
 
-            double inv_jac = 8*SQ(M_PI*sqrt_s)*(std::cos(phi1)*std::sin(phi2)-std::sin(phi1)*std::cos(phi2));
+            //double inv_jac = 8*SQ(M_PI*sqrt_s)*(std::cos(phi1)*std::sin(phi2)-std::sin(phi1)*std::cos(phi2));
             
-            return (SQ(E1)*SQ(E2)/(E1*E2)) / std::abs(inv_jac);
-        }
+            //return (SQ(E1)*SQ(E2)/(E1*E2)) / std::abs(inv_jac);
+        //}
 
     private:
         double sqrt_s;

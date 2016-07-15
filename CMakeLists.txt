@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
-project(MoMEMta)
+project(MoMEMta C CXX Fortran)
+#project(MoMEMta)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules")
 
@@ -47,16 +48,19 @@ endif(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 # Default compiler flags
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic -Wextra --std=c++11 -fcx-fortran-rules -fcx-limited-range")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fomit-frame-pointer -ffast-math -Wall --std=c11")
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fno-underscoring -fPIC")
 
 if (COVERAGE)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --coverage")
 endif()
 
 # If profiling, always include debug information
 if (PROFILING)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g")
 endif()
 
 # Compiler flags for each build type
@@ -112,6 +116,7 @@ set(MOMEMTA_SOURCES
     "modules/FlatTransferFunctionOnTheta.cc"
     "modules/GaussianTransferFunction.cc"
     "modules/TransferFunctionEvaluator.cc"
+    "modules/FlatTransferFunctionEvaluator.cc"
     "modules/MatrixElement.cc"
     "modules/NarrowWidthApproximation.cc"
     "modules/Permutator.cc"
@@ -136,6 +141,9 @@ set(MOMEMTA_SOURCES
 add_library(momemta SHARED ${MOMEMTA_SOURCES})
 set_target_properties(momemta PROPERTIES VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR})
+
+#add_library(libwrapper SHARED /home/fynu/asaggio/plugin_mode/models/SMEFT_FF_2/Fortran/VVS2_3.f /home/fynu/asaggio/plugin_mode/models/SMEFT_FF_2/Fortran/VVSS3_0.f /home/fynu/asaggio/plugin_mode/models/SMEFT_FF_2/Fortran/VVSS2_0.f)
+#set_target_properties(libwrapper PROPERTIES PREFIX "")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -169,8 +177,9 @@ target_link_libraries(momemta LINK_PRIVATE me_pp_ttx_fully_leptonic)
 target_link_libraries(momemta LINK_PRIVATE "-Wl,--whole-archive $<TARGET_FILE:me_pp_ttx_fully_leptonic> -Wl,--no-whole-archive")
 target_link_libraries(momemta LINK_PRIVATE me_pp_WW_fully_leptonic)
 target_link_libraries(momemta LINK_PRIVATE "-Wl,--whole-archive $<TARGET_FILE:me_pp_WW_fully_leptonic> -Wl,--no-whole-archive")
-target_link_libraries(momemta LINK_PRIVATE me_pp_ZZ_bbbb)
-target_link_libraries(momemta LINK_PRIVATE "-Wl,--whole-archive $<TARGET_FILE:me_pp_ZZ_bbbb> -Wl,--no-whole-archive")
+#target_link_libraries(libwrapper LINK_PRIVATE me_pp_hh_bbbb)
+target_link_libraries(momemta LINK_PRIVATE me_pp_hh_bbbb)
+target_link_libraries(momemta LINK_PRIVATE "-fPIC -Wl,--whole-archive $<TARGET_FILE:me_pp_hh_bbbb> -Wl,--no-whole-archive")
 
 add_library(empty_module SHARED "modules/EmptyModule.cc")
 
@@ -196,6 +205,7 @@ if(EXAMPLES)
 
     add_executable(example_HH_bbbb "examples/HH_bbbb.cc")
     target_link_libraries(example_HH_bbbb momemta)
+#    target_link_libraries(example_HH_bbbb libwrapper)
     set_target_properties(example_HH_bbbb PROPERTIES OUTPUT_NAME
       "HH_bbbb.exe")
 

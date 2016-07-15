@@ -3,5 +3,6 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 
 add_subdirectory(pp_ttx_fully_leptonic)
 add_subdirectory(pp_WW_fully_leptonic)
-add_subdirectory(pp_ZZ_bbbb)
+#add_subdirectory(pp_ZZ_bbbb)
+add_subdirectory(pp_hh_bbbb)
 add_subdirectory(dummy)

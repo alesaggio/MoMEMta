@@ -26,6 +26,7 @@
 #include <Math/DistFunc.h>
 
 
+//FIX DOCUMENTATION
 /** \brief Transfer function on energy described by a Gaussian distribution
  *
  * This module takes as inputs a LorentzVector and a phase-space point, generates
@@ -83,11 +84,6 @@ class TransferFunctionEvaluator: public Module {
             const LorentzVector& gen_particle = m_input2.get<LorentzVector>();
 
             double sigma = reco_particle.E() * m_sigma;
-
-            //double range_min = std::max(0., reco_particle.E() - (m_sigma_range * sigma));
-            //double range_max = reco_particle.E() + (m_sigma_range * sigma);
-            //double range = (range_max - range_min);
-
             double gen_E = gen_particle.E();
 
             // Compute TF
