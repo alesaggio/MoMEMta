@@ -180,7 +180,7 @@ Graph build(const Pool::DescriptionMap& description, std::vector<ModulePtr>& mod
 
     // We need to make sure that any dependencies of a module inside a looper
     // is ran before the looper itself.
-    for (const auto& vertex: vertices) {
+/*    for (const auto& vertex: vertices) {
         if (g[vertex.second].configuration_module.type == "Looper") {
 
             out_edge_iterator_t e, e_end;
@@ -207,7 +207,7 @@ Graph build(const Pool::DescriptionMap& description, std::vector<ModulePtr>& mod
                 }
             }
         }
-    }
+    }*/
 
     // Re-assign each vertex a continuous id
     id = 0;
@@ -257,7 +257,7 @@ Graph build(const Pool::DescriptionMap& description, std::vector<ModulePtr>& mod
 
 
     // Check for if a module use a Looper output but is not actually declared in the looper path
-    for (const auto& vertex: sorted_vertices) {
+   /* for (const auto& vertex: sorted_vertices) {
         if (g[vertex].configuration_module.type == "Looper") {
             // We know that the module is a Looper
             // grab its execution path from its configuration
@@ -288,7 +288,7 @@ Graph build(const Pool::DescriptionMap& description, std::vector<ModulePtr>& mod
                 }
             }
         }
-    }
+    }*/
 
     return g;
 }
