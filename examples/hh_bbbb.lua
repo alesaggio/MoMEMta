@@ -44,13 +44,12 @@ BlockG.blockg = {
 
 Looper.looper = {
     solutions = "blockg::solutions",
-    path = Path("tf_p1", "tf_p2", "tf_p3", "tf_p4", "phaseSpaceOut" , "initial_state", "hh", "integrand")
+    path = Path("tf_p1", "tf_p2", "tf_p3", "tf_p4", "initial_state", "hh", "integrand")
 }
 
 inputs_looper = {'looper::particles/1', 'looper::particles/2', 'looper::particles/3', 'looper::particles/4'}
 
 -- Loop
--- Assuming that the gen particles are the ones coming from the blockG
 
     BinnedTransferFunctionOnEnergyEvaluator.tf_p1 = {
         reco_particle = inputs[1],
@@ -80,16 +79,11 @@ inputs_looper = {'looper::particles/1', 'looper::particles/2', 'looper::particle
         th2_name = 'Binned_Egen_DeltaE_Norm_jet',
     }
 
-    StandardPhaseSpace.phaseSpaceOut = {
-        particles = inputs_looper -- only on visible particles
-    }
-
     BuildInitialState.initial_state = {
         particles = inputs_looper
     }
 
--- check the 'looper::jacobian'
-    jacobians = {'flatter_s12::jacobian', 'flatter_s34::jacobian', 'looper::jacobian', 'phaseSpaceOut::phase_space', 'tf_p1::TF', 'tf_p2::TF', 'tf_p3::TF', 'tf_p4::TF', 'looper::jacobian'}
+    jacobians = {'flatter_s12::jacobian', 'flatter_s34::jacobian', 'looper::jacobian', 'tf_p1::TF', 'tf_p2::TF', 'tf_p3::TF', 'tf_p4::TF', 'looper::jacobian'}
 
     MatrixElement.hh = {
         pdf = 'CT10nlo',
