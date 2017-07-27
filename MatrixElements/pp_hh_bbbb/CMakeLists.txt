@@ -1,4 +1,6 @@
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fno-underscoring -fPIC")
+project(pp_hh_bbbb C CXX Fortran)
+
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fno-underscoring -fPIC -ffixed-line-length-none")
 
 set(SOURCES
     "src/VVSS3_0.f"

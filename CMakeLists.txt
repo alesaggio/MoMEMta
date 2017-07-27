@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.2.1 FATAL_ERROR)
-project(MoMEMta C CXX Fortran)
+project(MoMEMta)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/modules")
 
@@ -260,6 +260,7 @@ endif()
 # Matrix elements
 add_subdirectory(MatrixElements)
 target_link_libraries(momemta PRIVATE matrix_elements)
+target_link_libraries(momemta PRIVATE "gfortran")
 
 add_library(empty_module SHARED "modules/EmptyModule.cc")
 target_link_libraries(empty_module momemta)

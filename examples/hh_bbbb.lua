@@ -4,6 +4,8 @@ local bjet2 = declare_input("bjet2")
 local bjet3 = declare_input("bjet3")
 local bjet4 = declare_input("bjet4")
 
+--add_reco_permutations(bjet1, bjet2, bjet3, bjet4)
+
 parameters = {
     energy = 13000.,
     H_mass = 125.09,
@@ -15,20 +17,27 @@ cuba = {
     verbosity = 3
 }
 
-BreitWignerGenerator.flatter_s12 = {
-    -- add_dimension() generates an input tag of type `cuba::ps_points/i`
-    -- where `i` is automatically incremented each time the function is called.
-    -- This function allows MoMEMta to track how many dimensions are needed for the integration.
-    ps_point = add_dimension(),
+NarrowWidthApproximation.nwa_s12 = {
     mass = parameter('H_mass'),
     width = parameter('H_width')
 }
 
-BreitWignerGenerator.flatter_s34 = {
-    ps_point = add_dimension(),
+NarrowWidthApproximation.nwa_s34 = {
     mass = parameter('H_mass'),
     width = parameter('H_width')
 }
+
+--BreitWignerGenerator.flatter_s12 = {
+--    ps_point = add_dimension(),
+--    mass = parameter('H_mass'),
+--    width = parameter('H_width')
+--}
+
+--BreitWignerGenerator.flatter_s34 = {
+--    ps_point = add_dimension(),
+--    mass = parameter('H_mass'),
+--    width = parameter('H_width')
+--}
 
 inputs = {bjet1.reco_p4, bjet2.reco_p4, bjet3.reco_p4, bjet4.reco_p4}
 
@@ -38,8 +47,11 @@ BlockG.blockg = {
     p3 = inputs[3],
     p4 = inputs[4],
 
-    s12 = 'flatter_s12::s',
-    s34 = 'flatter_s34::s',
+--    s12 = 'flatter_s12::s',
+--    s34 = 'flatter_s34::s',
+
+    s12 = 'nwa_s12::s',
+    s34 = 'nwa_s34::s',
 }
 
 Looper.looper = {
@@ -53,28 +65,32 @@ inputs_looper = {'looper::particles/1', 'looper::particles/2', 'looper::particle
 
     BinnedTransferFunctionOnEnergyEvaluator.tf_p1 = {
         reco_particle = inputs[1],
-        gen_particle = "looper::particles/1",
+        --gen_particle = "looper::particles/1",
+        gen_particle = inputs_looper[1],
         file = '/home/fynu/swertz/tests_MEM/binnedTF/TF_generator/Control_plots_hh_TF.root',
         th2_name = 'Binned_Egen_DeltaE_Norm_jet',
     }
 
     BinnedTransferFunctionOnEnergyEvaluator.tf_p2 = {
         reco_particle = inputs[2],
-        gen_particle = "looper::particles/2",
+        --gen_particle = "looper::particles/2",
+        gen_particle = inputs_looper[2],
         file = '/home/fynu/swertz/tests_MEM/binnedTF/TF_generator/Control_plots_hh_TF.root',
         th2_name = 'Binned_Egen_DeltaE_Norm_jet',
     }
 
     BinnedTransferFunctionOnEnergyEvaluator.tf_p3 = {
         reco_particle = inputs[3],
-        gen_particle = "looper::particles/3",
+        --gen_particle = "looper::particles/3",
+        gen_particle = inputs_looper[3],
         file = '/home/fynu/swertz/tests_MEM/binnedTF/TF_generator/Control_plots_hh_TF.root',
         th2_name = 'Binned_Egen_DeltaE_Norm_jet',
     }
 
     BinnedTransferFunctionOnEnergyEvaluator.tf_p4 = {
         reco_particle = inputs[4],
-        gen_particle = "looper::particles/4",
+        --gen_particle = "looper::particles/4",
+        gen_particle = inputs_looper[4],
         file = '/home/fynu/swertz/tests_MEM/binnedTF/TF_generator/Control_plots_hh_TF.root',
         th2_name = 'Binned_Egen_DeltaE_Norm_jet',
     }
@@ -83,7 +99,8 @@ inputs_looper = {'looper::particles/1', 'looper::particles/2', 'looper::particle
         particles = inputs_looper
     }
 
-    jacobians = {'flatter_s12::jacobian', 'flatter_s34::jacobian', 'looper::jacobian', 'tf_p1::TF', 'tf_p2::TF', 'tf_p3::TF', 'tf_p4::TF', 'looper::jacobian'}
+    jacobians = {'nwa_s12::jacobian', 'nwa_s34::jacobian',  'tf_p1::TF', 'tf_p2::TF', 'tf_p3::TF', 'tf_p4::TF', 'looper::jacobian'}
+--    jacobians = {'flatter_s12::jacobian', 'flatter_s34::jacobian',  'tf_p1::TF', 'tf_p2::TF', 'tf_p3::TF', 'tf_p4::TF', 'looper::jacobian'}
 
     MatrixElement.hh = {
         pdf = 'CT10nlo',
