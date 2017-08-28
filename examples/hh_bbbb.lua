@@ -121,12 +121,12 @@ inputs_looper = {'looper::particles/1', 'looper::particles/2', 'looper::particle
               me_index = 1,
             },
             {
-              pdg_id = 5,
-              me_index = 3,
-            },
-            {
               pdg_id = -5,
               me_index = 2,
+            },
+            {
+              pdg_id = 5,
+              me_index = 3,
             },
             {
               pdg_id = -5,
